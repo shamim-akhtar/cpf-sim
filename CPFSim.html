@@ -1,0 +1,1964 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>CPF Simulator</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<style>
+    #bs-example{
+        margin: 2px;        
+    }
+
+	#bs-example .col {
+  		border: 1px solid #c9c9c9;
+	}
+
+	#bs-example .col:not(:last-child) {
+  		border-right-width: 0;
+	}
+
+	#bs-example .row:not(:last-child) .col {
+  		border-bottom-width: 0;
+	}
+
+	#bs-example .bottom {
+    	border-bottom: 1px solid #ccc;
+	}
+    #ex1Slider .slider-selection {
+		background: #BABABA;
+	}
+	table, th, td 
+    {
+    	padding: 5px;
+      	border: 0.5px solid gray; 
+      	border-collapse: collapse;
+	}
+    
+    .analysis_table .row {
+  		display: flex;
+	}
+
+	.analysis_table .row > div 
+    {
+  		flex: 1;
+  		border: 1px solid grey;
+	}
+    
+    .verticalLine {
+  		border-left: thick solid #ff0000;
+	}
+</style>
+<script>
+
+function toFixed(value, preci) 
+{
+  	var precision = preci || 0,
+    	power = Math.pow(10, precision),
+    	absValue = Math.abs(Math.round(value * power)),
+    	result = (value < 0 ? '-' : '') + String(Math.floor(absValue / power));
+
+  	if (precision > 0) {
+    	var fraction = String(absValue % power),
+      	padding = new Array(Math.max(precision - fraction.length, 0) + 1).join('0');
+    	result += '.' + padding + fraction;
+  	}
+  	return result;
+}
+
+function getRandomColor() 
+{
+  	var letters = '0123456789ABCDEF';
+  	var color = '#';
+  	for (var i = 0; i < 6; i++) 
+    {
+    	color += letters[Math.floor(Math.random() * 16)];
+  	}
+  	return color;
+}
+
+
+const RetirementAge = 65;
+const CONST_SALARY_CAP = 6000.0;
+    
+// Get the allocation rate based on age.
+function getAllocationRate(age) 
+{
+	if (age < 35) return [0.23, 0.06, 0.08];
+	if (age >= 35 && age < 45) return [0.21, 0.07, 0.09];
+	if (age >= 45 && age < 50) return [0.19, 0.08, 0.10];
+	if (age >= 50 && age < 55) return [0.15, 0.115, 0.105];
+	if (age >= 55 && age < 60) return [0.12, 0.035, 0.105];
+	if (age >= 60 && age < 65) return [0.035, 0.025, 0.105];
+	if (age >= 65) return [0.01, 0.01, 0.105];
+} 
+
+function getContrib(age, sal)
+{
+	var allocRate = getAllocationRate(age);
+	return [sal > CONST_SALARY_CAP ? allocRate[0] * CONST_SALARY_CAP : allocRate[0] * sal,
+        sal > CONST_SALARY_CAP ? allocRate[1] * CONST_SALARY_CAP : allocRate[1] * sal,
+        sal > CONST_SALARY_CAP ? allocRate[2] * CONST_SALARY_CAP : allocRate[2] * sal,
+        0.0];
+}
+
+var logtext = "";
+var WRITE_LOG = true;
+function log(v)
+{
+	if(WRITE_LOG)
+    {
+		logtext = logtext + v + "<br>";
+    }
+}
+
+var data_collection_array = new Array();
+var name_array = new Array();
+var chart_total_balances = null;
+var chart_accounts = null;
+var chart_individual = null;
+var myform = null;
+
+var txt = "";
+
+// these are functions to create the HTML display of data.
+function PrintHTML_CPFBalance(data_collection)
+{
+	//-----------------------------------------------------------------------------//
+    // Print out the Account
+    //-----------------------------------------------------------------------------//
+    txt = txt + "<div>";
+  	txt = txt + "	<div class=\"row\">";    
+    txt = txt + "		<div class=\"col col-sm-1\">";
+    txt = txt + "  			Age";
+    txt = txt + "		</div>";
+	txt = txt + "		<div class=\"col col-sm-2\">";
+    txt = txt + "  			OA";
+    txt = txt + "		</div>";
+    txt = txt + "		<div class=\"col col-sm-2\">";
+    txt = txt + "  			SA";
+    txt = txt + "		</div>";
+    txt = txt + "		<div class=\"col col-sm-2\">";
+    txt = txt + "  			MA";
+    txt = txt + "		</div>";
+    txt = txt + "		<div class=\"col col-sm-2\">";
+    txt = txt + "  			RA";
+    txt = txt + "		</div>";    
+  	txt = txt + "	</div>";
+    
+    for(var i in data_collection)
+    {
+		txt = txt + "<div class=\"row\">";
+        
+    	txt = txt + "	<div class=\"col col-sm-1 text-center\">";
+    	txt = txt + data_collection[i]["age"];
+    	txt = txt + "	</div>";
+        
+    	txt = txt + "	<div class=\"col col-sm-2 text-right\">";
+    	txt = txt + toFixed(data_collection[i]["OA"][3],0);
+    	txt = txt + "	</div>";
+        
+    	txt = txt + "	<div class=\"col col-sm-2 text-right\">";
+    	txt = txt + toFixed(data_collection[i]["SA"][3],0);
+    	txt = txt + "	</div>";
+        
+    	txt = txt + "	<div class=\"col col-sm-2 text-right\">";
+    	txt = txt + toFixed(data_collection[i]["MA"][3],0);
+    	txt = txt + "	</div>";
+        
+    	txt = txt + "	<div class=\"col col-sm-2 text-right\">";
+    	txt = txt + toFixed(data_collection[i]["RA"][3],0);
+    	txt = txt + "	</div>";
+        
+		txt = txt + "</div>";
+    }
+	txt = txt + "</div>";  
+    return txt;
+}
+
+function MAToSATransfer(age, balance, currentBHS, currentFRS, tfr)
+{
+    if(balance[2] > currentBHS)
+    {       
+        var amt = balance[2] - currentBHS;
+        if(age < 55)
+        {
+             if(balance[1] < currentFRS)
+             {
+                // transfer to special account.
+                balance[1] += amt;
+                balance[2] -= amt;
+                tfr[1] += amt;
+                tfr[2] -= amt;
+                if(balance[1] > currentFRS)
+                {
+                    // more than FRS amount transfer to ordinary account.
+                    amt = balance[1] - currentFRS;
+                    balance[1] = currentFRS;
+                    balance[0] += amt;
+                    
+                    tfr[1] -= amt;
+                    tfr[0] += amt;
+                }
+             }
+             else
+             {
+                // transfer to ordinary.
+                balance[0] += amt;
+                balance[2] -= amt;
+                tfr[0] += amt; 
+                tfr[2] -= amt;                       
+             }
+        }
+        else
+        {
+             if(balance[3] < currentFRS)
+             {
+                // transfer to retirement account.
+                balance[3] += amt;
+                balance[2] -= amt;
+                
+                tfr[3] += amt;
+                tfr[2] -= amt;
+                if(balance[3] > currentFRS)
+                {
+                    // more than FRS amount transfer to ordinary account.
+                    amt = balance[3] - currentFRS;
+                    balance[3] = currentFRS;
+                    balance[0] += amt;
+                    
+                    tfr[3] -= amt;
+                    tfr[0] += amt;
+                }
+             }
+             else
+             {
+                // transfer to ordinary.
+                balance[0] += amt;
+                balance[2] -= amt;
+                tfr[0] += amt;  
+                tfr[2] -= amt;                      
+             }
+        }
+    }
+}
+    
+function Simulate()
+{
+    
+    myform = document.getElementById('simulator-form');
+    
+    // get the inputs.
+    var SIMULATION_NAME = document.getElementById("inputName").value;
+    var AGE = parseFloat(document.getElementById("inputAge").value);
+    var SALARY = parseFloat(document.getElementById("inputSalary").value);
+    var CASH = parseFloat(document.getElementById("inputCash").value);
+    var BONUS_MONTHS = parseFloat(document.getElementById("inputBonus").value);
+    var START_OA = parseFloat(document.getElementById("inputOA").value);
+    var START_SA = parseFloat(document.getElementById("inputSA").value);
+    var START_MA = parseFloat(document.getElementById("inputMA").value);
+    var BHS_RATE = parseFloat(document.getElementById("inputBHSRate").value);
+    var FRS_RATE = parseFloat(document.getElementById("inputFRSRate").value);
+    var HOUSING = parseFloat(document.getElementById("inputHousing").value);
+    var DPS = parseFloat(document.getElementById("inputDPS").value);
+    var DPS_M = parseInt(document.getElementById("inputDPSM").value);
+    var HPS = parseFloat(document.getElementById("inputHPS").value);
+    var HPS_M = parseInt(document.getElementById("inputHPSM").value);
+    var MEDISHIELD = parseFloat(document.getElementById("inputMedishield").value);
+    var MEDISHIELD_M = parseInt(document.getElementById("inputMedishieldM").value);
+    var ELDERSHIELD = parseFloat(document.getElementById("inputEldershield").value);
+    var ELDERSHIELD_M = parseInt(document.getElementById("inputEldershieldM").value);
+    var ALLOW_OA_SA_TFR = document.getElementById("allow_oa_sa").checked;
+    
+    function getProjectedValues(currentAge, currentBHS, currentFRS, numberOfYears, bhsRate, frsRate, allow)
+    {
+    	var data_collection = new Array();
+    	var balance = [START_OA, START_SA, START_MA, 0];
+        var age = currentAge;
+        var RetirementAge = numberOfYears + currentAge;
+        while(age <= RetirementAge)
+        {            
+            currentBHS = currentBHS*(1+bhsRate);
+            
+            if(age < 55)
+            {
+            	currentFRS = currentFRS*(1+frsRate);
+            }
+            
+        	var con = [0, 0, 0, 0];
+        	var ded = [0, 0, 0, 0];
+        	var int = [0, 0, 0, 0];
+        	var tfr = [0, 0, 0, 0];
+            var bon = [BONUS_MONTHS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            var hse = HOUSING;
+            var med = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            var dps = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            var hps = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            var eds = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            med[MEDISHIELD_M] = MEDISHIELD;
+            eds[ELDERSHIELD_M] = ELDERSHIELD;
+            dps[DPS_M] = DPS;
+            dps[HPS_M] = HPS;
+            
+            for(var m = 0; m < 12; ++m)
+            {
+            	var contrib = getContrib(age, SALARY); 
+            	balance[0] += contrib[0];
+            	balance[1] += contrib[1];
+            	balance[2] += contrib[2];
+            	balance[3] += contrib[3];
+                if(age < 55)
+                {
+                	if(balance[1] < currentFRS)
+                	{
+                		var amt = CASH;
+                    	if(balance[1] + CASH > currentFRS)
+                    	{
+                    		amt = balance[1] + CASH - currentFRS;
+                    	}
+                		balance[1] += amt;
+                    	tfr[1] += amt;
+                	}
+                }
+                
+                con[0] += contrib[0];
+                con[1] += contrib[1];
+                con[2] += contrib[2];
+                con[3] += contrib[3];
+                // Bonus -----------------------------------------------------------//
+                if(bon[m] > 0)
+                {
+                	var bon_count = Math.floor(bon[m]);
+                	for(var b = 0; b < bon_count; ++b)
+                    {
+                    	contrib = getContrib(age, bon[m]*SALARY);
+        				balance[0] += contrib[0];
+        				balance[1] += contrib[1];
+        				balance[2] += contrib[2];
+        				balance[3] += contrib[3];
+                
+                		con[0] += contrib[0];
+                		con[1] += contrib[1];
+                		con[2] += contrib[2];
+                		con[3] += contrib[3];
+                    }
+                    var deci = bon[m] - bon_count;
+                	contrib = getContrib(age, deci*SALARY);
+        			balance[0] += contrib[0];
+        			balance[1] += contrib[1];
+        			balance[2] += contrib[2];
+        			balance[3] += contrib[3];
+                
+                	con[0] += contrib[0];
+                    con[1] += contrib[1];
+                    con[2] += contrib[2];
+                    con[3] += contrib[3];
+                }
+                // Deductions -----------------------------------------------------------//
+                if(balance[0] > HOUSING)
+                {
+                	ded[0] += HOUSING;
+        			balance[0] -= HOUSING;
+                }
+                else
+                {
+                	//alert("Not enough balance in OA to deduct housing.");
+                    logtext = logtext + "Not enough balance in OA to deduct housing.<br>";
+                }                
+                
+                ded[0] += dps[m];
+        		balance[0] -= dps[m];
+                ded[0] += hps[m];
+        		balance[0] -= hps[m];
+                ded[2] += med[m];
+        		balance[2] -= med[m];
+                ded[2] += eds[m];
+        		balance[2] -= eds[m];
+                
+                // ALLOW_OA_SA_TFR
+                if(age < 55)
+                {
+                	if(allow)
+                    if(balance[1] < currentFRS)
+                	{
+                		var amt = balance[0];
+                    	if(balance[1] + balance[0] > currentFRS)
+                    	{
+                    		amt = balance[1] + balance[0] - currentFRS;
+                    	}
+                		balance[1] += amt;
+                   	 	tfr[1] += amt;
+                		balance[0] -= amt;
+                    	tfr[0] -= amt;
+                	}
+                }
+                
+                // Check for MA > BHS
+                MAToSATransfer(age, balance, currentBHS, currentFRS, tfr);
+                
+                // Monthly floor interest calculations-----------------------------------//
+                var oa_int = balance[0] * 0.025/12;
+                int[0] += oa_int;
+                var sa_int = balance[1] * 0.04/12;
+                int[1] += sa_int;
+                var ma_int = balance[2] * 0.04/12;
+                int[2] += ma_int;
+                var ra_int = balance[3] * 0.04/12;
+                int[3] += ra_int;
+            }
+            
+            // add the interest at the end of the year.
+            balance[0] += int[0];
+            balance[1] += int[1];
+            balance[2] += int[2];
+            balance[3] += int[3];
+            
+            // Check for MA > BHS after interest payment.            
+        	MAToSATransfer(age, balance, currentBHS, currentFRS, tfr);
+            
+            // create RA at 55.
+            if(age == 54)
+            {
+            	// RA is created.
+                if(balance[1] + balance[0] > 5000.0)
+                {
+                	if(balance[1] > currentFRS)
+                	{
+                		balance[3] = currentFRS;
+                    	balance[1] -= currentFRS;
+                	}
+                	else
+                	{
+                    	balance[3] = balance[1];
+                    	balance[1] = 0.0;
+                    	// remaining from OA.
+                    	if(balance[0] > (currentFRS - balance[1]))
+                    	{
+                    		var bal = currentFRS - balance[1];
+                    		balance[3] += bal;
+                        	balance[0] -= bal;
+                    	}
+                    	else
+                    	{
+                        	balance[3] += balance[0];
+                        	balance[0] = 0;     
+                   	 	}
+                	}
+                }
+                else
+                {
+                	balance[3] = 0.0;
+                }
+            }
+            
+            // add to data_collection.
+        	data_collection.push(
+            {
+            	"age": age, 
+                "BHS": currentBHS, 
+                "FRS": currentFRS,
+                "OA": [con[0], ded[0], int[0], balance[0], tfr[0]],
+                "SA": [con[1], ded[1], int[1], balance[1], tfr[1]],
+                "MA": [con[2], ded[2], int[2], balance[2], tfr[2]],
+                "RA": [con[3], ded[3], int[3], balance[3], tfr[3]]
+            });
+            age += 1;
+        }
+        data_collection_array.push(data_collection);
+        name_array.push(SIMULATION_NAME);
+    }
+    
+    getProjectedValues(AGE, 63000.0, 186000, RetirementAge-AGE, BHS_RATE/100, FRS_RATE/100, ALLOW_OA_SA_TFR);
+}
+
+function addData(chart, label, data) 
+{
+    chart.data.labels.push(label);
+    chart.data.datasets.forEach((dataset) => 
+    {
+        dataset.data.push(data);
+    });
+    chart.update();
+}
+
+function addDataSet(chart, labels, data_array)
+{
+	for(var i = 0; i < labels.length; ++i)
+    {
+		addData(chart, labels[i], data_array[i]);
+    }
+}
+
+function PrintHTML_TotalBalances(name, data_collection)
+{
+	var acc55 = [0, 0, 0, 0];
+	var acc65 = [0, 0, 0, 0];
+    var bhs55, bhs65, frs55;
+    var oa_sa55 = 0;
+    var oa_sa65 = 0;
+    var oa_sa_ra55 = 0;
+    var oa_sa_ra65 = 0;
+    var total55 = 0;
+    var total65 = 0;
+	for(var i in data_collection)
+    {
+    	if(data_collection[i]["age"]==54)
+        {
+        	acc55[0] = data_collection[i]["OA"][3];
+        	acc55[1] = data_collection[i]["SA"][3];
+        	acc55[2] = data_collection[i]["MA"][3];
+        	acc55[3] = data_collection[i]["RA"][3];
+            bhs55 = data_collection[i]["BHS"];
+            frs55 = data_collection[i]["FRS"];
+            oa_sa55 = acc55[0] + acc55[1];
+            oa_sa_ra55 = acc55[0] + acc55[1] + acc55[3];
+            total55 = acc55[0] + acc55[1] + acc55[2] + acc55[3];
+        }
+    	if(data_collection[i]["age"]==64)
+        {
+        	acc65[0] = data_collection[i]["OA"][3];
+        	acc65[1] = data_collection[i]["SA"][3];
+        	acc65[2] = data_collection[i]["MA"][3];
+        	acc65[3] = data_collection[i]["RA"][3];
+            bhs65 = data_collection[i]["BHS"];
+            oa_sa65 = acc65[0] + acc65[1];
+            oa_sa_ra65 = acc65[0] + acc65[1] + acc65[3];
+            total65 = acc65[0] + acc65[1] + acc65[2] + acc65[3];
+        }
+    } 
+    //style="background-color:#f2f2f2;
+
+	var txt ="";  
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-6\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-6 text-right\" style=\"background-color:white;\"><h5>" + name + "</h5></div>";
+   	txt = txt + "</div><hr>";    
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-3 text-right border border-light\" style=\"background-color:lightgrey;\"><b>Start of age 55</b></div>";
+    txt = txt + "	<div class=\"col-sm-3 text-right border border-light\" style=\"background-color:lightgrey;\"><b>Start of age 65</b></div>";
+  	txt = txt + "</div>";   
+    
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:#f5f2f2;\">BHS</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:ghostwhite;\">" + 
+    	bhs55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:white;\">" + 
+    	bhs65.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div>";
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:#f5f2f2;\">FRS</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:ghostwhite;\">" + 
+    	frs55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 text-right\" style=\"background-color:white;\">" + 
+    	frs55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div><hr>";
+    
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:#f5f2f2;\">OA</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:ghostwhite;\">" + 
+    	acc55[0].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:white;\">" + 
+    	acc65[0].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div>";
+    
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:#f5f2f2;\">SA</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:ghostwhite;\">" + 
+    	acc55[1].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:white;\">" + 
+    	acc65[1].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div>";
+    
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:#f5f2f2;\">MA</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:ghostwhite;\">" + 
+    	acc55[2].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:white;\">" + 
+    	acc65[2].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div>";
+    
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:#f5f2f2;\">RA</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:ghostwhite;\">" + 
+    	acc55[3].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:white;\">" + 
+    	acc65[3].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div><hr>";
+    
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:#f8f8f8;\">OA + SA</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:#f8f8f8;\">" + 
+    	oa_sa55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:#f8f8f8;\">" + 
+    	oa_sa65.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div>";
+    
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:#f0f0f0;\">OA + SA + RA</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:#f0f0f0;\">" + 
+    	oa_sa_ra55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:#f0f0f0;\">" + 
+    	oa_sa_ra65.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div>";
+    
+  	txt = txt + "<div class=\"row border border-light\">";
+    txt = txt + "	<div class=\"col-sm-2\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-4 border border-light\" style=\"background-color:Gainsboro;\">Total CPF</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:Gainsboro;\">" + 
+    	total55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+    txt = txt + "	<div class=\"col-sm-3 border border-light text-right\" style=\"background-color:Gainsboro;\">" + 
+    	total65.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</div>";
+  	txt = txt + "</div>";
+    
+    return txt;
+}
+
+function PrintHTML_Accounts(name, data_collection)
+{
+	var txt =""; 
+    
+    // ------------------------- ACCOUNT DETAILS WITH AGE ----------------------------------------------//
+  	//txt = txt + "<div class=\"row border border-white\">";
+    //txt = txt + "	<div class=\"col-sm-6\" style=\"background-color:#e6e6ff;\"><h5>Account Details with Age</h5></div>";
+  	//txt = txt + "</div><hr>"; 
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-6\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-6 text-right\" style=\"background-color:white;\"><h5>" + name + "</h5></div>";
+   	txt = txt + "</div><hr>";    
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-1 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Age</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>OA</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>SA</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>MA</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>RA</b></div>";
+    txt = txt + "	<div class=\"col-sm-3 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Total</b></div>";
+  	txt = txt + "</div>";    
+    
+	for(var i in data_collection)
+    {
+    	var oa = data_collection[i]["OA"][3].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var sa = data_collection[i]["SA"][3].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var ma = data_collection[i]["MA"][3].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var ra = data_collection[i]["RA"][3].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+        var tot = data_collection[i]["OA"][3]+data_collection[i]["SA"][3]+data_collection[i]["MA"][3]+data_collection[i]["RA"][3];
+        var total = tot.toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	txt = txt + "<div class=\"row border border-white\">";
+    	txt = txt + "	<div class=\"col-sm-1 text-center border border-light\" style=\"background-color:#f2f2f2;\">" + data_collection[i]["age"] + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:ghostwhite;\">" + oa + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + sa + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:ghostwhite;\">" + ma + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + ra + "</div>";
+    	txt = txt + "	<div class=\"col-sm-3 text-right border border-light\" style=\"background-color:white;\">" + total + "</div>";
+    	txt = txt + "</div>";    
+    }    
+  	txt = txt + "</div><hr>"; 
+    
+    return txt;
+}
+
+function PrintHTML_Individual(name, data_collection)
+{
+	var txt =""; 
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-6\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-6 text-right\" style=\"background-color:white;\"><h5>" + name + "</h5></div>";
+   	txt = txt + "</div><hr>";    
+    
+    //-----------------INDIVIDUAL ACCOUNT DETAILS WITH AGE -------------------------------//   
+    // Ordinary Account
+  	//txt = txt + "<div class=\"row border border-white\">";
+    //txt = txt + "	<div class=\"col-sm-6\" style=\"background-color:#e6e6ff;\"><h5>Individual Account Details with Age</h5></div>";
+  	//txt = txt + "</div><hr>"; 
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-6\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-6 text-right\" style=\"background-color:white;\"><h6>Ordinary Account</h6></div>";
+  	txt = txt + "</div><hr>";    
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Age</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Contribution</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Deduction</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Interest</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Transfers</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Total</b></div>";
+  	txt = txt + "</div>";    
+    
+	for(var i in data_collection)
+    {
+    	var con = data_collection[i]["OA"][0].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var ded = data_collection[i]["OA"][1].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var int = data_collection[i]["OA"][2].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var tfr = data_collection[i]["OA"][4].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var tot = data_collection[i]["OA"][3].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+        
+    	txt = txt + "<div class=\"row border border-white\">";
+    	txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:#f2f2f2;\">" + data_collection[i]["age"] + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:ghostwhite;\">" + con + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + ded + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:ghostwhite;\">" + int + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + tfr + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + tot + "</div>";
+	   	txt = txt + "</div>";    
+    }
+    txt = txt + "<hr>";
+    
+    // Special Account    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-6\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-6 text-right\" style=\"background-color:white;\"><h6>Special Account</h6></div>";
+  	txt = txt + "</div><hr>";    
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Age</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Contribution</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Deduction</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Interest</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Transfers</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Total</b></div>";
+  	txt = txt + "</div>";    
+    
+	for(var i in data_collection)
+    {
+    	var con = data_collection[i]["SA"][0].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var ded = data_collection[i]["SA"][1].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var int = data_collection[i]["SA"][2].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var tfr = data_collection[i]["SA"][4].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var tot = data_collection[i]["SA"][3].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+        
+    	txt = txt + "<div class=\"row border border-white\">";
+    	txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:#f2f2f2;\">" + data_collection[i]["age"] + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:ghostwhite;\">" + con + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + ded + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:ghostwhite;\">" + int + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + tfr + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + tot + "</div>";
+	   	txt = txt + "</div>";    
+    }
+    txt = txt + "<hr>";
+    
+    // Medisave Account    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-6\" style=\"background-color:white;\"></div>";
+    txt = txt + "	<div class=\"col-sm-6 text-right\" style=\"background-color:white;\"><h6>Medisave Account</h6></div>";
+  	txt = txt + "</div><hr>";    
+    
+  	txt = txt + "<div class=\"row border border-white\">";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Age</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Contribution</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Deduction</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Interest</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Transfers</b></div>";
+    txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:lightgrey;\"><b>Total</b></div>";
+  	txt = txt + "</div>";    
+    
+	for(var i in data_collection)
+    {
+    	var con = data_collection[i]["MA"][0].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var ded = data_collection[i]["MA"][1].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var int = data_collection[i]["MA"][2].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var tfr = data_collection[i]["MA"][4].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+    	var tot = data_collection[i]["MA"][3].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+        
+    	txt = txt + "<div class=\"row border border-white\">";
+    	txt = txt + "	<div class=\"col-sm-2 text-center border border-light\" style=\"background-color:#f2f2f2;\">" + data_collection[i]["age"] + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:ghostwhite;\">" + con + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + ded + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:ghostwhite;\">" + int + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + tfr + "</div>";
+    	txt = txt + "	<div class=\"col-sm-2 text-right border border-light\" style=\"background-color:white;\">" + tot + "</div>";
+	   	txt = txt + "</div>";    
+    }
+    txt = txt + "<hr>";
+    //-----------------INDIVIDUAL ACCOUNT DETAILS WITH AGE -------------------------------//
+    
+    return txt;
+}
+
+function Print_TotalBalances()
+{
+    var data_collection = data_collection_array[data_collection_array.length-1];
+    var name = name_array[name_array.length - 1];
+    
+    var txt = document.getElementById('Print_TotalBalances').innerHTML;
+    var txt_balance = PrintHTML_TotalBalances(name, data_collection);
+    txt = txt + txt_balance;
+    
+    document.getElementById('Print_TotalBalances').innerHTML = txt;
+}
+
+function Print_Accounts()
+{
+    var data_collection = data_collection_array[data_collection_array.length-1];
+    var name = name_array[name_array.length - 1];
+    
+    var txt = document.getElementById('Print_Accounts').innerHTML;
+    var txt_balance = PrintHTML_Accounts(name, data_collection);
+    txt = txt + txt_balance;
+    
+    document.getElementById('Print_Accounts').innerHTML = txt;
+}
+
+function Print_Individual()
+{
+    var data_collection = data_collection_array[data_collection_array.length-1];
+    var name = name_array[name_array.length - 1];
+    
+    var txt = document.getElementById('Print_Individual').innerHTML;
+    var txt_balance = PrintHTML_Individual(name, data_collection);
+    txt = txt + txt_balance;
+    
+    document.getElementById('Print_Individual').innerHTML = txt;
+}
+
+function Chart_CreateAccountDetails()
+{
+	var mydata = 
+    {
+    	labels: [],
+        datasets: []
+    };
+	var balances_oa = [];
+	var balances_sa = [];
+	var balances_ma = [];
+	var balances_ra = [];
+    
+    var data_collection = data_collection_array[data_collection_array.length-1];
+	for(var i in data_collection)
+    {
+    	mydata.labels.push(data_collection[i]["age"]);
+    	var oa = data_collection[i]["OA"][3];
+    	var sa = data_collection[i]["SA"][3];
+    	var ma = data_collection[i]["MA"][3];
+    	var ra = data_collection[i]["RA"][3];
+    	balances_oa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: oa
+        });
+    	balances_sa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: sa
+        });
+    	balances_ma.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: ma
+        });
+    	balances_ra.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: ra
+        });
+    }
+    
+	var dataset_oa =
+    {
+    	label: "OA",
+    	data: balances_oa,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderCapStyle: 'square'
+    };
+    mydata.datasets.push(dataset_oa);
+    
+	var dataset_sa =
+    {
+    	label: "SA",
+    	data: balances_sa,
+    	fill: false,
+    	backgroundColor: "rgba(255,0,255,0.4)",
+    	borderCapStyle: 'square'
+    };
+    mydata.datasets.push(dataset_sa);
+    
+	var dataset_ma =
+    {
+    	label: "MA",
+    	data: balances_ma,
+    	fill: false,
+    	backgroundColor: "rgba(0,0,255,0.4)",
+    	borderCapStyle: 'square'
+    };
+    mydata.datasets.push(dataset_ma);
+    
+	var dataset_ra =
+    {
+    	label: "RA",
+    	data: balances_ra,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,0,0.4)",
+    	borderCapStyle: 'square'
+    };
+    mydata.datasets.push(dataset_ra);
+    
+    var chart_id = "chart_ACCOUNT_DETAILS_" + data_collection_array.length;
+	var ctx = document.getElementById(chart_id);    
+	var chartOptions = 
+    {
+  		legend: 
+        {
+    		display: true,
+    		position: 'top',
+    		labels: 
+        	{
+     			boxWidth: 80,
+      			fontColor: 'black'
+    		}
+  		},
+    	responsive: true,
+        maintainAspectRatio: false,
+        scales: 
+        {
+            yAxes: [
+            {
+                ticks: 
+                {
+                    beginAtZero: true,
+                    callback: function(value, index, values) 
+                    {
+                        //return value.toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+                        
+                        var ranges = 
+                        [
+                            { divider: 1e6, suffix: 'M' },
+                            { divider: 1e3, suffix: 'k' }
+                        ];
+                        function formatNumber(n) 
+                        {
+                            for (var i = 0; i < ranges.length; i++) 
+                            {
+                                if (n >= ranges[i].divider) 
+                                {
+                                return (n / ranges[i].divider).toString() + ranges[i].suffix;
+                                }
+                            }
+                            return n;
+                        }
+                        return '$' + formatNumber(value);
+                    }
+                }
+            }]
+        },
+        tooltips: 
+        {
+            enabled: true,
+            mode: 'single',
+            callbacks: 
+            {
+                title: function(tooltipItems, data) 
+                {
+                    var label = data.datasets[tooltipItems[0].datasetIndex].label || '';
+                    return label; //"Age: " + tooltipItems[0].xLabel;
+                },
+                label: function(tooltipItems, data) 
+                {
+                    var label = data.datasets[tooltipItems.datasetIndex].label || '';
+                    if (label) 
+                    {
+                        label += ': ';
+                    }
+                    return " Age:" + tooltipItems.xLabel + " | " + 
+                        tooltipItems.yLabel.toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+                }
+            }
+        }
+	};
+	var chart = new Chart(ctx, 
+    {
+    	type: 'line',
+    	data: mydata,
+    	options: chartOptions
+	});
+    chart.update();
+}
+
+function DrawChart_TotalBalances()
+{    
+	var labels = []; 
+	var balances = [];
+	var balances_oa_sa = [];
+    
+	var n = data_collection_array.length-1;
+    var data_collection = data_collection_array[data_collection_array.length-1];
+	var name = name_array[n];
+	for(var i in data_collection)
+    {
+        labels.push(data_collection[i]["age"]); 
+        var value = 
+        	data_collection[i]["OA"][3] + data_collection[i]["SA"][3] + 
+            data_collection[i]["MA"][3] + data_collection[i]["RA"][3];
+    	balances.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: toFixed(value, 2)
+        });
+        
+        var oa_sa = data_collection[i]["OA"][3] + data_collection[i]["SA"][3];
+    	balances_oa_sa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: toFixed(oa_sa, 2)
+        });
+    }
+    
+	var newDataSet1 =
+    {
+    	label: name + " Total CPF Balance",
+    	data: balances,
+    	fill: false,
+        
+    	borderColor: getRandomColor(),
+    	backgroundColor: getRandomColor(),
+    	borderCapStyle: 'square',
+        borderWidth: 1,
+        pointRadius: 1.5
+    };
+    
+	var newDataSet2 =
+    {
+    	label: name + " OA and SA Balance",
+    	data: balances_oa_sa,
+    	fill: false,
+        
+    	borderColor: getRandomColor(),
+    	backgroundColor: getRandomColor(),
+    	borderCapStyle: 'square',
+        borderWidth: 1,
+        pointRadius: 1.5
+    };
+    chart_total_balances.data.labels = labels;
+    chart_total_balances.data.datasets.push(newDataSet1); 
+    chart_total_balances.data.datasets.push(newDataSet2);   
+    chart_total_balances.update();
+}
+
+function DrawChart_Accounts()
+{
+	var balances_oa = [];
+	var balances_sa = [];
+	var balances_ma = [];
+	var balances_ra = [];
+    var labels = [];
+    var data_collection = data_collection_array[data_collection_array.length-1];
+    var name = name_array[name_array.length - 1];
+	for(var i in data_collection)
+    {
+    	labels.push(data_collection[i]["age"]);
+    	var oa = data_collection[i]["OA"][3];
+    	var sa = data_collection[i]["SA"][3];
+    	var ma = data_collection[i]["MA"][3];
+    	var ra = data_collection[i]["RA"][3];
+    	balances_oa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: oa
+        });
+    	balances_sa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: sa
+        });
+    	balances_ma.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: ma
+        });
+    	balances_ra.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: ra
+        });
+    }
+    
+	var dataset_oa =
+    {
+    	label: name+"-OA",
+    	data: balances_oa,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    
+	var dataset_sa =
+    {
+    	label: name + "-SA",
+    	data: balances_sa,
+    	fill: false,
+    	backgroundColor: "rgba(255,0,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    
+	var dataset_ma =
+    {
+    	label: name + "-MA",
+    	data: balances_ma,
+    	fill: false,
+    	backgroundColor: "rgba(0,0,255,0.4)",
+        borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    
+	var dataset_ra =
+    {
+    	label: name + "-RA",
+    	data: balances_ra,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,0,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+
+    chart_accounts.data.labels = labels;
+    chart_accounts.data.datasets.push(dataset_oa);   
+    chart_accounts.data.datasets.push(dataset_sa);  
+    chart_accounts.data.datasets.push(dataset_ma);  
+    chart_accounts.data.datasets.push(dataset_ra);  
+    chart_accounts.update();
+}
+
+function DrawChart_Individual()
+{
+	var con_oa = [];
+	var con_sa = [];
+	var con_ma = [];
+	var ded_oa = [];
+	var ded_ma = [];
+	var int_oa = [];
+	var int_sa = [];
+	var int_ma = [];
+	var int_ra = [];
+	//var tfr_oa_sa = [];
+	//var tfr_ma_sa = [];
+	//var tfr_ma_oa = [];
+    
+    var labels = [];
+    var data_collection = data_collection_array[data_collection_array.length-1];
+    var name = name_array[name_array.length - 1];
+	for(var i in data_collection)
+    {
+    	labels.push(data_collection[i]["age"]);
+    	var conoa = data_collection[i]["OA"][0];
+    	var consa = data_collection[i]["SA"][0];
+    	var conma = data_collection[i]["MA"][0];
+        
+    	con_oa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: conoa
+        });
+    	con_sa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: consa
+        });
+    	con_ma.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: conma
+        });
+        
+    	var dedoa = data_collection[i]["OA"][1];
+    	var dedma = data_collection[i]["MA"][1];
+        
+    	ded_oa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: dedoa
+        });
+    	ded_ma.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: dedma
+        });
+        
+    	var intoa = data_collection[i]["OA"][2];
+    	var intsa = data_collection[i]["SA"][2];
+    	var intma = data_collection[i]["MA"][2];
+    	var intra = data_collection[i]["RA"][2];
+        
+    	int_oa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: intoa
+        });
+    	int_sa.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: intsa
+        });
+    	int_ma.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: intma
+        });
+    	int_ra.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: intra
+        });
+    }
+    
+	var dataset_con_oa =
+    {
+    	label: name+"-CON-OA",
+    	data: con_oa,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_con_oa);
+    
+	var dataset_con_sa =
+    {
+    	label: name+"-CON-SA",
+    	data: con_sa,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_con_sa);
+    
+	var dataset_con_ma =
+    {
+    	label: name+"-CON-MA",
+    	data: con_ma,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_con_ma);
+    
+	var dataset_int_oa =
+    {
+    	label: name+"-INT-OA",
+    	data: int_oa,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_int_oa);
+    
+	var dataset_int_sa =
+    {
+    	label: name+"-INT-SA",
+    	data: int_sa,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_int_sa);
+    
+	var dataset_int_ma =
+    {
+    	label: name+"-INT-MA",
+    	data: int_ma,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_int_ma);
+    
+	var dataset_int_ra =
+    {
+    	label: name+"-INT-RA",
+    	data: int_ra,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_int_ra);
+    
+	var dataset_ded_oa =
+    {
+    	label: name+"-DED-OA",
+    	data: ded_oa,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_ded_oa);
+    
+	var dataset_ded_ma =
+    {
+    	label: name+"-DED-MA",
+    	data: ded_ma,
+    	fill: false,
+    	backgroundColor: "rgba(0,255,255,0.4)",
+    	borderColor: getRandomColor(),
+        borderWidth: 1,
+        pointRadius: 1.5,
+    	borderCapStyle: 'square'
+    };
+    chart_individual.data.datasets.push(dataset_ded_ma);
+
+    chart_individual.data.labels = labels;
+    chart_individual.update();
+}
+
+function CreateChart_TotalBalances()
+{
+	if(chart_total_balances != null) return;
+    
+    var mydata = 
+    {
+    	labels: [],
+        datasets: []
+    };
+	var ctx = document.getElementById('chart_TOTAL_BALANCES');    
+	var chartOptions = 
+    {
+  		legend: 
+        {
+    		display: true,
+    		position: 'bottom',
+    		labels: 
+        	{
+     			boxWidth: 15,
+      			fontColor: 'black'
+    		}
+  		},
+		title: 
+        {
+			display: true,
+			text: 'Total Account Balance Comparison'
+		},
+    	responsive: true,
+        maintainAspectRatio: false,
+        scales: 
+        {
+            yAxes: [
+            {
+                ticks: 
+                {
+                    beginAtZero: true,
+                    callback: function(value, index, values) 
+                    {                        
+                        var ranges = 
+                        [
+                            { divider: 1e6, suffix: 'M' },
+                            { divider: 1e3, suffix: 'k' }
+                        ];
+                        function formatNumber(n) 
+                        {
+                            for (var i = 0; i < ranges.length; i++) 
+                            {
+                                if (n >= ranges[i].divider) 
+                                {
+                                return (n / ranges[i].divider).toString() + ranges[i].suffix;
+                                }
+                            }
+                            return n;
+                        }
+                        return '$' + formatNumber(value);
+                    }
+                }
+            }]
+        },
+        tooltips: 
+        {
+            enabled: true,
+            mode: 'single',
+            callbacks: 
+            {
+                title: function(tooltipItems, data) 
+                {
+                    var label = data.datasets[tooltipItems[0].datasetIndex].label || '';
+                    return label; //"Age: " + tooltipItems[0].xLabel;
+                },
+                label: function(tooltipItems, data) 
+                {
+                    var label = data.datasets[tooltipItems.datasetIndex].label || '';
+                    if (label) 
+                    {
+                        label += ': ';
+                    }
+                    return " Age:" + tooltipItems.xLabel + " | " + 
+                        tooltipItems.yLabel.toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+                }
+            }
+        }
+	};
+	chart_total_balances = new Chart(ctx, 
+    {
+    	type: 'line',
+    	data: mydata,
+    	options: chartOptions
+	});
+    document.getElementById('chart_TOTAL_BALANCES').style.display = "none"; 
+}
+
+function CreateChart_Accounts()
+{
+	if(chart_accounts != null) return;
+    
+    var mydata = 
+    {
+    	labels: [],
+        datasets: []
+    };
+	var ctx = document.getElementById('chart_accounts');    
+	var chartOptions = 
+    {
+  		legend: 
+        {
+    		display: true,
+    		position: 'bottom',
+    		labels: 
+        	{
+     			boxWidth: 15,
+      			fontColor: 'black'
+    		}
+  		},
+		title: 
+        {
+			display: true,
+			text: 'Individual Account Comparison'
+		},
+    	responsive: true,
+        maintainAspectRatio: false,
+        scales: 
+        {
+            yAxes: [
+            {
+                ticks: 
+                {
+                    beginAtZero: true,
+                    callback: function(value, index, values) 
+                    {                        
+                        var ranges = 
+                        [
+                            { divider: 1e6, suffix: 'M' },
+                            { divider: 1e3, suffix: 'k' }
+                        ];
+                        function formatNumber(n) 
+                        {
+                            for (var i = 0; i < ranges.length; i++) 
+                            {
+                                if (n >= ranges[i].divider) 
+                                {
+                                	return (n / ranges[i].divider).toString() + ranges[i].suffix;
+                                }
+                            }
+                            return n;
+                        }
+                        return '$' + formatNumber(value);
+                    }
+                }
+            }]
+        },
+        tooltips: 
+        {
+            enabled: true,
+            mode: 'single',
+            callbacks: 
+            {
+                title: function(tooltipItems, data) 
+                {
+                    var label = data.datasets[tooltipItems[0].datasetIndex].label || '';
+                    return label;
+                },
+                label: function(tooltipItems, data) 
+                {
+                    var label = data.datasets[tooltipItems.datasetIndex].label || '';
+                    if (label) 
+                    {
+                        label += ': ';
+                    }
+                    return " Age:" + tooltipItems.xLabel + " | " + 
+                        tooltipItems.yLabel.toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+                }
+            }
+        }
+	};
+	chart_accounts = new Chart(ctx, 
+    {
+    	type: 'line',
+    	data: mydata,
+    	options: chartOptions
+	});
+    document.getElementById('chart_accounts').style.display = "none"; 
+}
+
+function CreateChart_Individual()
+{
+	if(chart_individual != null) return;
+    
+    var mydata = 
+    {
+    	labels: [],
+        datasets: []
+    };  
+	var chartOptions = 
+    {
+  		legend: 
+        {
+    		display: true,
+    		position: 'bottom',
+    		labels: 
+        	{
+     			boxWidth: 15,
+      			fontColor: 'black'
+    		}
+  		},
+		title: 
+        {
+			display: true,
+			text: 'Individual Account Components Comparison'
+		},
+    	responsive: true,
+        maintainAspectRatio: false,
+        scales: 
+        {
+            yAxes: [
+            {
+                ticks: 
+                {
+                    beginAtZero: true,
+                    callback: function(value, index, values) 
+                    {                        
+                        var ranges = 
+                        [
+                            { divider: 1e6, suffix: 'M' },
+                            { divider: 1e3, suffix: 'k' }
+                        ];
+                        function formatNumber(n) 
+                        {
+                            for (var i = 0; i < ranges.length; i++) 
+                            {
+                                if (n >= ranges[i].divider) 
+                                {
+                                	return (n / ranges[i].divider).toString() + ranges[i].suffix;
+                                }
+                            }
+                            return n;
+                        }
+                        return '$' + formatNumber(value);
+                    }
+                }
+            }]
+        },
+        tooltips: 
+        {
+            enabled: true,
+            mode: 'single',
+            callbacks: 
+            {
+                title: function(tooltipItems, data) 
+                {
+                    var label = data.datasets[tooltipItems[0].datasetIndex].label || '';
+                    return label;
+                },
+                label: function(tooltipItems, data) 
+                {
+                    var label = data.datasets[tooltipItems.datasetIndex].label || '';
+                    if (label) 
+                    {
+                        label += ': ';
+                    }
+                    return " Age:" + tooltipItems.xLabel + " | " + 
+                        tooltipItems.yLabel.toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+                }
+            }
+        }
+	};
+	var ctx = document.getElementById('chart_individual');  
+	chart_individual = new Chart(ctx, 
+    {
+    	type: 'line',
+    	data: mydata,
+    	options: chartOptions
+	});
+    document.getElementById('chart_individual').style.display = "none"; 
+}
+
+var Print_Title_Flag = false;
+function Print_Title()
+{
+	if(Print_Title_Flag) return;
+    Print_Title_Flag = true;
+    var txt = document.getElementById('analysis_area').innerHTML;
+    
+    txt = txt + "\
+	<div class=\"row\">\
+    	<div class=\"col-sm-12 text-center\"><h2>CPF Simulation Analysis</h2></div>\
+	</div>\
+	<hr>\
+	<div class=\"row\">\
+    	<div class=\"col-sm-12 text-center\" style=\"background-color:white;\"><h4>Total Account Balance</h4></div>\
+	</div>\
+	<hr>\
+  	<div class=\"row\">\
+    	<div class=\"col-sm-12\" style=\" height: 400px; width: 100%;\">\
+    		<canvas id=\"chart_TOTAL_BALANCES\"></canvas>\
+  		</div>\
+  	</div>\
+  	<hr>\
+  	<div class=\"row\">\
+    	<div class=\"col-sm-12\">\
+			<div class=\"container\" id=\"Print_TotalBalances\"></div>\
+  		</div>\
+  	</div>\
+  	<hr>\
+	<div class=\"row\">\
+    	<div class=\"col-sm-12 text-center\" style=\"background-color:white;\"><h4>Individual Account with Age</h4></div>\
+	</div>\
+	<hr>\
+  	<div class=\"row\">\
+    	<div class=\"col-sm-12\" style=\" height: 400px; width: 100%;\">\
+    		<canvas id=\"chart_accounts\"></canvas>\
+  		</div>\
+  	</div>\
+  	<hr>\
+  	<div class=\"row\">\
+    	<div class=\"col-sm-12\">\
+			<div class=\"container\" id=\"Print_Accounts\"></div>\
+  		</div>\
+  	</div>\
+  	<hr>\
+	<div class=\"row\">\
+    	<div class=\"col-sm-12 text-center\" style=\"background-color:white;\"><h4>Individual Account Components with Age</h4></div>\
+	</div>\
+	<hr>\
+  	<div class=\"row\">\
+    	<div class=\"col-sm-12\" style=\" height: 400px; width: 100%;\">\
+    		<canvas id=\"chart_individual\"></canvas>\
+  		</div>\
+  	</div>\
+  	<hr>\
+  	<div class=\"row\">\
+    	<div class=\"col-sm-12\">\
+			<div class=\"container\" id=\"Print_Individual\"></div>\
+  		</div>\
+  	</div>";
+    document.getElementById('analysis_area').innerHTML = txt;
+}
+
+function RunSimulation()
+{    
+    Print_Title();
+    
+	Simulate();
+    
+	CreateChart_TotalBalances();
+	CreateChart_Accounts();
+	CreateChart_Individual();
+    
+    DrawChart_TotalBalances();
+    Print_TotalBalances();
+    
+    DrawChart_Accounts();
+    Print_Accounts();
+    
+    DrawChart_Individual();
+    Print_Individual();
+    
+    document.getElementById('chart_TOTAL_BALANCES').style.display = "initial";   
+    document.getElementById('chart_accounts').style.display = "initial"; 
+    document.getElementById('chart_individual').style.display = "initial";  
+}
+
+function ClearAll()
+{
+	data_collection_array = new Array();    
+    chart_total_balances.data.datasets = [];   
+    chart_total_balances.update();
+    
+    chart_accounts.data.datasets = [];
+    chart_accounts.data.update = [];
+    
+    
+    document.getElementById('chart_TOTAL_BALANCES').style.display = "none";
+    document.getElementById('chart_accounts').style.display = "none";
+    document.getElementById('chart_individual').style.display = "none";
+    chart_individual = null;
+    chart_accounts = null;
+    chart_total_balances = null;
+    document.getElementById('analysis_area').innerHTML = "";
+    Print_Title_Flag = false;
+}
+
+</script>
+
+<div class="container">
+		<hr>
+        <div class="row">
+            <div class="col-sm-12 text-center"><h2>CPF Simulator</h2></div>
+        </div>
+        <hr>
+    <form id="simulator-form" class="needs-validation" method="post" novalidate="">
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right"></label>
+            <div class="col-sm-6 bottom"><b>Basic Inputs</b>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right " for="inputName">Simulation Name</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="inputName" value="Simulation 1" required="">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputAge">Age</label>
+            <div class="col-sm-6">
+                <input type="number" class="form-control" id="inputAge" value="30" required="" min="18" max="65">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputSalary">Salary (SGD)</label>
+            <div class="col-sm-6">
+                <input type="number" class="form-control" id="inputSalary" value="3000.00" required="" step="0.01" min="500" max="6000">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputBonus">Bonus (months)</label>
+            <div class="col-sm-6">
+                <input type="number" class="form-control" id="inputBonus" value="1">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputCash">Monthly Top-up</label>
+            <div class="col-sm-6">
+                <input type="number" class="form-control" id="inputCash" value="0.00" required="" step="0.01" min="0.00" max="5000.00">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right"></label>
+            <div class="col-sm-6 bottom"><b>Starting Account Balance</b>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputOA">Ordinary Account</label>
+            <div class="col-sm-6">
+                <input type="number" class="form-control" id="inputOA" value="0.00" required="" step="0.01" min="0.00" max="500000.00">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputSA">Special Account</label>
+            <div class="col-sm-6">
+                <input type="number" class="form-control" id="inputSA" value="0.00" required="" step="0.01" min="0.00" max="500000.00">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputMA">Medisave Account</label>
+            <div class="col-sm-6">
+                <input type="number" class="form-control" id="inputMA" value="0.00" required="" step="0.01" min="0.00" max="500000.00">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right"></label>
+            <div class="col-sm-6 bottom"><b>BHS &amp; FRS Rates of Increase</b>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">FRS Rate</label>
+            <div class="col-sm-3">
+                <select class="custom-select" id="inputFRSRate">
+                    <option value="0.0">0.0</option>
+                    <option value="0.5">0.5</option>
+                    <option value="1.0">1.0</option>
+                    <option value="1.5">1.5</option>
+                    <option value="2.0">2.0</option>
+                    <option value="2.5">2.5</option>
+                    <option value="3.0">3.0</option>
+                    <option value="3.5">3.5</option>
+                    <option value="4.0">4.0</option>
+                    <option value="4.5">4.5</option>
+                    <option value="5.0">5.0</option>
+                    <option value="5.5">5.5</option>
+                    <option value="6.0">6.0</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">BHS Rate</label>
+            <div class="col-sm-3">
+                <select class="custom-select" id="inputBHSRate">
+                    <option value="0.0">0.0</option>
+                    <option value="0.5">0.5</option>
+                    <option value="1.0">1.0</option>
+                    <option value="1.5">1.5</option>
+                    <option value="2.0">2.0</option>
+                    <option value="2.5">2.5</option>
+                    <option value="3.0">3.0</option>
+                    <option value="3.5">3.5</option>
+                    <option value="4.0">4.0</option>
+                    <option value="4.5">4.5</option>
+                    <option value="5.0">5.0</option>
+                    <option value="5.5">5.5</option>
+                    <option value="6.0">6.0</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row ">
+            <label class="col-sm-3 col-form-label text-right"></label>
+            <div class="col-sm-6 bottom"><b>Deductions</b>
+            </div>
+        </div>
+        <div class="form-group row ">
+            <label class="col-sm-3 col-form-label text-right" for="inputHousing">Housing</label>
+            <div class="col-sm-6">
+                <input type="number" class="form-control" id="inputHousing" value="0.00" required="" step="0.01" min="0" max="1500">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">DPS</label>
+            <div class="col-sm-3">
+                <input type="number" class="form-control" id="inputDPS" value="0.00" required="" step="0.01" min="0.00" max="500.00">
+            </div>
+            <div class="col-sm-3">
+                <select class="custom-select" id="inputDPSM">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">HPS</label>
+            <div class="col-sm-3">
+                <input type="number" class="form-control" id="inputHPS" value="0.00" required="" step="0.01" min="0.00" max="500.00">
+            </div>
+            <div class="col-sm-3">
+                <select class="custom-select" id="inputHPSM">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">Medishield</label>
+            <div class="col-sm-3">
+                <input type="number" class="form-control" id="inputMedishield" value="0.00" required="" step="0.01" min="0" max="2500">
+            </div>
+            <div class="col-sm-3">
+                <select class="custom-select" id="inputMedishieldM">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">Eldershield</label>
+            <div class="col-sm-3">
+                <input type="number" class="form-control" id="inputEldershield" value="0.00" required="" step="0.01" min="0" max="2500">
+            </div>
+            <div class="col-sm-3">
+                <select class="custom-select" id="inputEldershieldM">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">Allow OA to SA Transfer</label>
+            <div class="col-sm-9 mt-2">
+                <label class="mb-0 mr-3">
+                    <input type="radio" class="mr-1" name="allow_oa_to_sa" id="allow_oa_sa"> Yes
+                </label>
+                <label class="mb-0 mr-3">
+                    <input type="radio" class="mr-1" name="allow_oa_to_sa" checked="checked"> No
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-19 offset-sm-3">
+                <input type="button" class="btn btn-primary" value="Simulate" onclick="RunSimulation()">
+                <input type="button" class="btn btn-secondary" value="Reset All Simulations" onclick="ClearAll()">
+            </div>
+        </div>
+    </form>
+</div>
+<hr>
+
+<div class="container" id="analysis_area">
+</div>
