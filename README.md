@@ -1,6 +1,6 @@
 # CPF Simulator
 
-![Total Account Balance](https://github.com/shamim-akhtar/cpf-sim/blob/main/screenshot5.jpg)
+![Total Account Balance](https://github.com/shamim-akhtar/cpf-sim/blob/main/screenshot6.jpg)
 
 This is a CPF Simulator that simulates the CPF accounts based on publicly available information. You can use this simulator to optimize your CPF account outputs by comparing and contrasting across multiple simulation runs.
 
