@@ -6,7 +6,11 @@ This is a CPF Simulator that simulates the CPF accounts based on publicly availa
 
 You can run the CPF simulator multiple times with different names and different inputs and then you can compare the account outputs based on the inputs you keyed in.
 
-
+<p align='center'>
+<a href="https://faramira.com/cpf-simulator-to-optimize-your-cpf-amounts/">
+    <img src="https://img.shields.io/badge/%20-Try%20CPF%20Simulator-blue" />
+  </a>
+</p>
 
 **Disclaimer**
 
