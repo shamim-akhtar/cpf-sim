@@ -3,6 +3,8 @@ This is a CPF Simulator that simulates the CPF accounts based on publicly availa
 
 You can run the CPF simulator multiple times with different names and different inputs and then you can compare the account outputs based on the inputs you keyed in.
 
+![Total Account Balance](https://octodex.github.com/images/yaktocat.png)
+
 **Disclaimer**
 
 *I am not a financial advisor. Neither am I trying to sell you anything. This CPF simulator is for educational purposes. The calculations used in this simulator are derived from publicly available information. It projects the CPF account amounts based on the inputs you provide. No data is retained for the working of the simulator. The entire calculation takes place on the browser and no data is sent to the server. Do note that this is the first version of the CPF Simulator and I am still testing on it. If you find any problem or flaws please send me a note either via comments or via email.*
