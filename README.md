@@ -1,9 +1,13 @@
 # CPF Simulator
+
+![Total Account Balance](https://github.com/shamim-akhtar/cpf-sim/blob/main/screenshot5.jpg)
+
+
 This is a CPF Simulator that simulates the CPF accounts based on publicly available information. You can use this simulator to optimize your CPF account outputs by comparing and contrasting across multiple simulation runs.
 
 You can run the CPF simulator multiple times with different names and different inputs and then you can compare the account outputs based on the inputs you keyed in.
 
-![Total Account Balance](https://octodex.github.com/images/yaktocat.png)
+
 
 **Disclaimer**
 
