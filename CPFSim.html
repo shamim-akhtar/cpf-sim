@@ -6,48 +6,11 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <style>
-    #bs-example{
-        margin: 2px;        
+    @media (min-width: 1200px) {
+    .container{
+        max-width: 930px;
     }
-
-	#bs-example .col {
-  		border: 1px solid #c9c9c9;
-	}
-
-	#bs-example .col:not(:last-child) {
-  		border-right-width: 0;
-	}
-
-	#bs-example .row:not(:last-child) .col {
-  		border-bottom-width: 0;
-	}
-
-	#bs-example .bottom {
-    	border-bottom: 1px solid #ccc;
-	}
-    #ex1Slider .slider-selection {
-		background: #BABABA;
-	}
-	table, th, td 
-    {
-    	padding: 5px;
-      	border: 0.5px solid gray; 
-      	border-collapse: collapse;
-	}
-    
-    .analysis_table .row {
-  		display: flex;
-	}
-
-	.analysis_table .row > div 
-    {
-  		flex: 1;
-  		border: 1px solid grey;
-	}
-    
-    .verticalLine {
-  		border-left: thick solid #ff0000;
-	}
+}
 </style>
 <script>
 
@@ -468,7 +431,7 @@ function Simulate()
         name_array.push(SIMULATION_NAME);
     }
     
-    getProjectedValues(AGE, 63000.0, 186000, RetirementAge-AGE, BHS_RATE/100, FRS_RATE/100, ALLOW_OA_SA_TFR);
+    getProjectedValues(AGE, 68500.0, 198800, RetirementAge-AGE, BHS_RATE/100, FRS_RATE/100, ALLOW_OA_SA_TFR);
 }
 
 function addData(chart, label, data) 
@@ -1951,14 +1914,13 @@ function ClearAll()
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-19 offset-sm-3">
+            
                 <input type="button" class="btn btn-primary" value="Simulate" onclick="RunSimulation()">
                 <input type="button" class="btn btn-secondary" value="Reset All Simulations" onclick="ClearAll()">
-            </div>
         </div>
     </form>
 </div>
 <hr>
 
-<div class="container" id="analysis_area">
+<div class="container-sm" id="analysis_area">
 </div>
