@@ -1657,13 +1657,13 @@ function RunSimulation()
 	CreateChart_Individual();
     
     DrawChart_TotalBalances();
-    Print_TotalBalances();
+    //Print_TotalBalances();
     
     DrawChart_Accounts();
-    Print_Accounts();
+    //Print_Accounts();
     
     DrawChart_Individual();
-    Print_Individual();
+    //Print_Individual();
     
     document.getElementById('chart_TOTAL_BALANCES').style.display = "initial";   
     document.getElementById('chart_accounts').style.display = "initial"; 
@@ -1693,7 +1693,6 @@ function ClearAll()
 </script>
 
 <div class = "container-md">
-    <div class="col justify-content-center">
         <form id="simulator-form" class="needs-validation" method="post" novalidate="">
             <div class="card">
                 <h6 class="card-header text-white bg-primary mb-3">Basic Inputs</h6>
@@ -1933,7 +1932,6 @@ function ClearAll()
                 </div>
             </div>
         </form>
-    </div>
 </div>
 
 <div class="container-sm" id="analysis_area">
