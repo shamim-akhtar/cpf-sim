@@ -8,6 +8,10 @@
     .container{
         max-width: 930px;
     }
+    .chart-container {
+    width: 100%;  /* Set the width of the parent container to 100% */
+    height: 100%;  /* Set the height of the parent container to 100% */
+  }
 }
 
 </style>
@@ -379,7 +383,7 @@ function Simulate()
         	MAToSATransfer(age, balance, currentBHS, currentFRS, tfr);
             
             // create RA at 55.
-            if(age == 54)
+            if(age == 55)
             {
             	// RA is created.
                 if(balance[1] + balance[0] > 5000.0)
@@ -764,6 +768,136 @@ function Print_TotalBalances()
     document.getElementById('Print_TotalBalances').innerHTML = txt;
 }
 
+function Print_TotalBalances_New()
+{
+    var data_collection = data_collection_array[data_collection_array.length-1];
+    var name = name_array[name_array.length - 1];
+
+    
+	var acc55 = [0, 0, 0, 0];
+	var acc65 = [0, 0, 0, 0];
+    var bhs55, bhs65, frs55;
+    var oa_sa55 = 0;
+    var oa_sa65 = 0;
+    var oa_sa_ra55 = 0;
+    var oa_sa_ra65 = 0;
+    var total55 = 0;
+    var total65 = 0;
+	for(var i in data_collection)
+    {
+    	if(data_collection[i]["age"]==54)
+        {
+        	acc55[0] = data_collection[i]["OA"][3];
+        	acc55[1] = data_collection[i]["SA"][3];
+        	acc55[2] = data_collection[i]["MA"][3];
+        	acc55[3] = data_collection[i]["RA"][3];
+            bhs55 = data_collection[i]["BHS"];
+            frs55 = data_collection[i]["FRS"];
+            oa_sa55 = acc55[0] + acc55[1];
+            oa_sa_ra55 = acc55[0] + acc55[1] + acc55[3];
+            total55 = acc55[0] + acc55[1] + acc55[2] + acc55[3];
+        }
+    	if(data_collection[i]["age"]==64)
+        {
+        	acc65[0] = data_collection[i]["OA"][3];
+        	acc65[1] = data_collection[i]["SA"][3];
+        	acc65[2] = data_collection[i]["MA"][3];
+        	acc65[3] = data_collection[i]["RA"][3];
+            bhs65 = data_collection[i]["BHS"];
+            oa_sa65 = acc65[0] + acc65[1];
+            oa_sa_ra65 = acc65[0] + acc65[1] + acc65[3];
+            total65 = acc65[0] + acc65[1] + acc65[2] + acc65[3];
+        }
+    } 
+    
+    var txt = document.getElementById('Print_TotalBalances55').innerHTML;
+    txt = "<div><h6>"+ name + "</h6><br>"+
+            "You will have <span class=\"badge badge-primary\">$" + 
+            total55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + 
+            "</span> in your CPF accounts. The projected Full Retirement Sum based on the rate of increase you provided will be <span class=\"badge badge-secondary\">$" + 
+            frs55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</span></div><br>"; 
+    document.getElementById('Print_TotalBalances55').innerHTML = txt;
+
+    txt = document.getElementById('Print_TotalBalances65').innerHTML;
+    txt = "<div><h6>"+ name + "</h6><br>"+
+            "You will have <span class=\"badge badge-primary\">$" + 
+            total65.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + 
+            "</span> in your CPF accounts. The projected amount in your retirement account with 4% rate of increase will be <span class=\"badge badge-secondary\">$" + 
+            acc65[3].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</span></div><br>"; 
+    document.getElementById('Print_TotalBalances65').innerHTML = txt;
+    
+    var myDoughnut55 = CreateDoughnutChart(document.getElementById('doughnut_TOTAL_BALANCES_55'), acc55, ['OA', 'SA', 'MA']);
+    document.getElementById('doughnut_TOTAL_BALANCES_65').style.display = "none";  
+    document.getElementById('doughnut_TOTAL_BALANCES_65').style.display = "block";  
+    myDoughnut55.update();  
+    
+    var myDoughnut65 = CreateDoughnutChart(document.getElementById('doughnut_TOTAL_BALANCES_65'), acc65, ['OA', 'SA', 'MA', 'RA']);
+    document.getElementById('doughnut_TOTAL_BALANCES_65').style.display = "none";  
+    document.getElementById('doughnut_TOTAL_BALANCES_65').style.display = "block"; 
+    myDoughnut65.update(); 
+    
+}
+
+function CreateDoughnutChart(ctx, accdata, lbs)
+{
+    const data = {
+        labels: lbs,
+        datasets: [
+            {
+                label: 'Account information',
+                data: accdata,
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)'
+                ],
+                hoverOffset: 4
+            }
+        ]
+    };
+    const config = {
+        type: 'doughnut',
+        data: data,
+        options: {
+	        cutoutPercentage : 30,
+            animateScale: true,
+            maintainAspectRatio: true,
+            responsive: true,
+            layout: {
+                padding: 0,
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    align: 'start',
+                },
+                title: {
+                    display: true,
+                    text: 'Account Information'
+                },
+            },
+            tooltips: 
+            {
+                enabled: true,
+                mode: 'single',
+                callbacks: 
+                {
+                    title: function(tooltipItems, data) 
+                    {
+                        return data['labels'][tooltipItems[0]['index']];
+                    },
+                    label: function(tooltipItems, data) 
+                    {
+                        return data['datasets'][0]['data'][tooltipItems['index']].toLocaleString("en-SG",{style:"currency", currency:"SGD"});
+                    }
+                }
+            }
+        },
+    };
+    var myDoughnut = new Chart(ctx, config);
+    return myDoughnut;
+}
+
 function Print_Accounts()
 {
     var data_collection = data_collection_array[data_collection_array.length-1];
@@ -956,6 +1090,7 @@ function DrawChart_TotalBalances()
 	var labels = []; 
 	var balances = [];
 	var balances_oa_sa = [];
+	var balances_ra = [];
     
 	var n = data_collection_array.length-1;
     var data_collection = data_collection_array[data_collection_array.length-1];
@@ -978,6 +1113,13 @@ function DrawChart_TotalBalances()
         	x: data_collection[i]["age"], 
         	y: toFixed(oa_sa, 2)
         });
+        
+        var ra = data_collection[i]["RA"][3];
+    	balances_ra.push(
+        {
+        	x: data_collection[i]["age"], 
+        	y: toFixed(ra, 2)
+        });
     }
     
 	var newDataSet1 =
@@ -989,7 +1131,7 @@ function DrawChart_TotalBalances()
     	borderColor: getRandomColor(),
     	backgroundColor: getRandomColor(),
     	borderCapStyle: 'square',
-        borderWidth: 1,
+        borderWidth: 2,
         pointRadius: 1.5
     };
     
@@ -1002,12 +1144,26 @@ function DrawChart_TotalBalances()
     	borderColor: getRandomColor(),
     	backgroundColor: getRandomColor(),
     	borderCapStyle: 'square',
-        borderWidth: 1,
+        borderWidth: 2,
+        pointRadius: 1.5
+    };
+    
+	var newDataSet3 =
+    {
+    	label: name + " RA Balance",
+    	data: balances_ra,
+    	fill: false,
+        
+    	borderColor: getRandomColor(),
+    	backgroundColor: getRandomColor(),
+    	borderCapStyle: 'square',
+        borderWidth: 2,
         pointRadius: 1.5
     };
     chart_total_balances.data.labels = labels;
     chart_total_balances.data.datasets.push(newDataSet1); 
-    chart_total_balances.data.datasets.push(newDataSet2);   
+    chart_total_balances.data.datasets.push(newDataSet2);  
+    chart_total_balances.data.datasets.push(newDataSet3);   
     chart_total_balances.update();
 }
 
@@ -1648,26 +1804,29 @@ function Print_Title()
 
 function RunSimulation()
 {    
-    Print_Title();
+    //Print_Title();
     
 	Simulate();
     
 	CreateChart_TotalBalances();
-	CreateChart_Accounts();
-	CreateChart_Individual();
+	//CreateChart_Accounts();
+	//CreateChart_Individual();
     
     DrawChart_TotalBalances();
-    //Print_TotalBalances();
+    Print_TotalBalances_New();
     
-    DrawChart_Accounts();
+    //DrawChart_Accounts();
     //Print_Accounts();
     
-    DrawChart_Individual();
+    //DrawChart_Individual();
     //Print_Individual();
+
     
-    document.getElementById('chart_TOTAL_BALANCES').style.display = "initial";   
-    document.getElementById('chart_accounts').style.display = "initial"; 
-    document.getElementById('chart_individual').style.display = "initial";  
+    
+    document.getElementById("analysis_area").style.display = "block";
+    document.getElementById('chart_TOTAL_BALANCES').style.display = "block";   
+    //document.getElementById('chart_accounts').style.display = "initial"; 
+    //document.getElementById('chart_individual').style.display = "initial";  
 }
 
 function ClearAll()
@@ -1732,6 +1891,7 @@ function ClearAll()
                     </div>
                 </div>
             </div>
+            <br>
             <div class="card">
                 <div class="card-header  text-white bg-success"><h6>Starting Account Balance</h6></div>
                 <div class="card-body">
@@ -1758,6 +1918,7 @@ function ClearAll()
                     </div>
                 </div>
             </div>
+            <br>
             <div class="card">
                 <div class="card-header text-white bg-secondary mb-3"><h6>BHS &amp; FRS Rates of Increase</h6></div>
                 <div class="card-body">
@@ -1806,6 +1967,7 @@ function ClearAll()
                     </div>
                 </div>
             </div>
+            <br>
             <div class="card">
                 <div class="card-header  text-white bg-warning mb-3"><h6>Deductions</h6></div>
                 <div class="card-body">
@@ -1934,5 +2096,86 @@ function ClearAll()
         </form>
 </div>
 
-<div class="container-sm" id="analysis_area">
+<div class="container-md" id="analysis_area" style="display: none;">
+    <h5 class="card-header text-white bg-info mb-3">Simulation Results</h5>
+    <div class="card">
+		<div class="card-body">
+
+    <!-- <div class="row"> -->
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Just before your 55th birthday!</h5>
+              
+                <!-- <div style=" height: 100%; width: 100%;"> -->
+                <div class="chart-container">
+                    <canvas id="doughnut_TOTAL_BALANCES_55"></canvas>
+                </div>
+                <p class="card-text" id="Print_TotalBalances55">
+                </p>
+                <a href="https://www.cpf.gov.sg/member/retirement-income/retirement-withdrawals/withdrawing-for-immediate-retirement-needs" class="btn btn-primary">Understand withdrawal options</a>
+            </div>
+          </div>
+        </div>
+        <br>
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Just before your 65th birthday!</h5>
+              
+                <div class="chart-container">
+                    <canvas id="doughnut_TOTAL_BALANCES_65"></canvas>
+                </div>
+                <p class="card-text" id="Print_TotalBalances65">
+                </p>
+                <a href="https://www.cpf.gov.sg/member/infohub/be-ready/meeting-my-retirement-needs?utm_source=gle&utm_medium=sem&utm_campaign=brd" class="btn btn-primary">Meeting retirement needs</a>
+              </div>
+            </div>
+          </div>
+        </div>
+    <!-- </div> -->
+    
+    <div class="row">
+        <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Account Balance Accumulation</h5>
+    
+            <p class="card-text">The below figure shows the total account balance for 
+                your CPF using two line graphs per simulation run. The first line graph shows the total account balance, 
+                which is the sum of the Ordinary, Special, Retirement and Medisave accounts. 
+                The second line graph shows the sum of the withdrawable amount, which is the sum of the 
+                Ordinary and Special accounts only after deducting the Full Retirement Sum at the start of your
+                55th Year (the graph shows the transfer at X-axis value 54, which means the end of 54th Year.</p>
+                <div style=" height: 400px; width: 100%;">
+                    <canvas id="chart_TOTAL_BALANCES"></canvas>
+                </div>
+                <h6 class="card-title" id="Print_TotalBalances"></h6>
+          </div>
+        </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+	<!-- <div class="card">    
+		<div class="card-body">
+            <p class="card-text">The below figure shows the total account balance for 
+                your CPF using two line graphs per simulation run. The first line graph shows the total account balance, 
+                which is the sum of the Ordinary, Special, Retirement and Medisave accounts. 
+                The second line graph shows the sum of the withdrawable amount, which is the sum of the 
+                Ordinary and Special accounts only after deducting the Full Retirement Sum at the start of your
+                55th Year (the graph shows the transfer at X-axis value 54, which means the end of 54th Year.</p>
+            <hr>
+
+            <div>
+                <div class="row">
+                    <div class="col-sm-12" style=" height: 400px; width: 100%;">
+                        <canvas id="chart_TOTAL_BALANCES"></canvas>
+                    </div>
+                </div>
+            </div>		
+			<h6 class="card-title" id="Print_TotalBalances"></h6>
+        </div>
+	</div> -->
 </div>
