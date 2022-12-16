@@ -811,20 +811,34 @@ function Print_TotalBalances_New()
     } 
     
     var txt = document.getElementById('Print_TotalBalances55').innerHTML;
-    txt = "<div><h6>"+ name + "</h6><br>"+
-            "You will have <span class=\"badge badge-primary\">$" + 
+    // txt =   "You will have <span class=\"badge badge-primary\">$" + 
+    //         total55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + 
+    //         "</span> in your CPF accounts. The projected Full Retirement Sum based on the rate of increase you provided will be <span class=\"badge badge-secondary\">$" + 
+    //         frs55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</span><br>"; 
+    txt =   "You will have <span class=\"badge badge-primary\">$" + 
             total55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + 
-            "</span> in your CPF accounts. The projected Full Retirement Sum based on the rate of increase you provided will be <span class=\"badge badge-secondary\">$" + 
-            frs55.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</span></div><br>"; 
+            "</span> in your CPF accounts.<br>"; 
     document.getElementById('Print_TotalBalances55').innerHTML = txt;
 
     txt = document.getElementById('Print_TotalBalances65').innerHTML;
-    txt = "<div><h6>"+ name + "</h6><br>"+
-            "You will have <span class=\"badge badge-primary\">$" + 
+    // txt = "<div><h6>"+ name + "</h6><br>"+
+    //         "You will have <span class=\"badge badge-primary\">$" + 
+    //         total65.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + 
+    //         "</span> in your CPF accounts. The projected amount in your retirement account with 4% rate of increase will be <span class=\"badge badge-secondary\">$" + 
+    //         acc65[3].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</span></div><br>"; 
+    txt =  "You will have <span class=\"badge badge-primary\">$" + 
             total65.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + 
             "</span> in your CPF accounts. The projected amount in your retirement account with 4% rate of increase will be <span class=\"badge badge-secondary\">$" + 
-            acc65[3].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</span></div><br>"; 
+            acc65[3].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</span><br>"; 
     document.getElementById('Print_TotalBalances65').innerHTML = txt;
+
+    txt = 
+        "You will have <span class=\"badge badge-primary\">$" + 
+        total65.toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + 
+        "</span> in your CPF accounts. The projected amount in your retirement account with 4% rate of increase will be <span class=\"badge badge-secondary\">$" + 
+        acc65[3].toLocaleString("en-SG",{style:"currency", currency:"SGD"}) + "</span></div><br>"; 
+    
+    document.getElementById('Print_TotalBalances55_Details').innerHTML = txt;
     
     var myDoughnut55 = CreateDoughnutChart(document.getElementById('doughnut_TOTAL_BALANCES_55'), acc55, ['OA', 'SA', 'MA']);
     document.getElementById('doughnut_TOTAL_BALANCES_65').style.display = "none";  
@@ -1849,6 +1863,23 @@ function ClearAll()
     Print_Title_Flag = false;
 }
 
+function CollapseInfo()
+{
+    var d = document.getElementById('collapseExample').style.display;
+    if(d == "none")
+    {
+        document.getElementById('collapseExample').style.display = "block";
+    }
+    else
+    {
+        document.getElementById('collapseExample').style.display = "none";
+    }
+    // var dis = document.getElementById('collapseExample').innerHTML;
+    // if(dis.length == "") 
+    // document.getElementById('collapseExample').innerHTML = "spafhashv lasdfh;ilhfio ;h;ioasdh fih;iogha";
+    // else document.getElementById('collapseExample').innerHTML = "";
+}
+
 </script>
 
 <div class = "container-md">
@@ -2098,84 +2129,96 @@ function ClearAll()
 
 <div class="container-md" id="analysis_area" style="display: none;">
     <h5 class="card-header text-white bg-info mb-3">Simulation Results</h5>
+
     <div class="card">
 		<div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Just before your 55th birthday!</h5>                        
+                            <div class="chart-container">
+                                <canvas id="doughnut_TOTAL_BALANCES_55"></canvas>
+                            </div>
+                            <p class="card-text" id="Print_TotalBalances55"></p>
+                            <!-- <div class="row">
+                                <div class="col">
+                                    <h6 align="right">Ordinary Account (OA)</h6>
+                                </div>
+                                <div class="col" id="Print_TotalBalances55_OS">
+                                    <h6>$000,000.00</h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <h6 align="right">Special Account (SA)</h6>
+                                </div>
+                                <div class="col" id="Print_TotalBalances55_SA">
+                                    <h6>$000,000.00</h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <h6 align="right">Medisave Account (MA)</h6>
+                                </div>
+                                <div class="col" id="Print_TotalBalances55_OS">
+                                    <h6>$000,000.00</h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <p align="right">Full Retirement Sum (FRS)</p>
+                                </div>
+                                <div class="col" id="Print_TotalBalances55_FRS">
+                                    <h6>$000,000.00</h6>
+                                </div>
+                            </div> -->
+                            <!-- <a href="https://www.cpf.gov.sg/member/retirement-income/retirement-withdrawals/withdrawing-for-immediate-retirement-needs" class="btn btn-primary">Understand withdrawal options</a> -->
+                            <div class="col text-center"><input type="button" class="btn btn-secondary" value="See Details" onclick="CollapseInfo()"></div>
+                            <br>
 
-    <!-- <div class="row"> -->
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Just before your 55th birthday!</h5>
-              
-                <!-- <div style=" height: 100%; width: 100%;"> -->
-                <div class="chart-container">
-                    <canvas id="doughnut_TOTAL_BALANCES_55"></canvas>
-                </div>
-                <p class="card-text" id="Print_TotalBalances55">
-                </p>
-                <a href="https://www.cpf.gov.sg/member/retirement-income/retirement-withdrawals/withdrawing-for-immediate-retirement-needs" class="btn btn-primary">Understand withdrawal options</a>
-            </div>
-          </div>
-        </div>
-        <br>
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Just before your 65th birthday!</h5>
-              
-                <div class="chart-container">
-                    <canvas id="doughnut_TOTAL_BALANCES_65"></canvas>
-                </div>
-                <p class="card-text" id="Print_TotalBalances65">
-                </p>
-                <a href="https://www.cpf.gov.sg/member/infohub/be-ready/meeting-my-retirement-needs?utm_source=gle&utm_medium=sem&utm_campaign=brd" class="btn btn-primary">Meeting retirement needs</a>
-              </div>
-            </div>
-          </div>
-        </div>
-    <!-- </div> -->
-    
-    <div class="row">
-        <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Account Balance Accumulation</h5>
-    
-            <p class="card-text">The below figure shows the total account balance for 
-                your CPF using two line graphs per simulation run. The first line graph shows the total account balance, 
-                which is the sum of the Ordinary, Special, Retirement and Medisave accounts. 
-                The second line graph shows the sum of the withdrawable amount, which is the sum of the 
-                Ordinary and Special accounts only after deducting the Full Retirement Sum at the start of your
-                55th Year (the graph shows the transfer at X-axis value 54, which means the end of 54th Year.</p>
-                <div style=" height: 400px; width: 100%;">
-                    <canvas id="chart_TOTAL_BALANCES"></canvas>
-                </div>
-                <h6 class="card-title" id="Print_TotalBalances"></h6>
-          </div>
-        </div>
-        </div>
-    </div>
-    </div>
-    </div>
+                            <div class="card card-body" id="collapseExample" style="display: none">
+                                <p class="card-text" id="Print_TotalBalances55_Details"></p>                                
+                            </div>
 
-	<!-- <div class="card">    
-		<div class="card-body">
-            <p class="card-text">The below figure shows the total account balance for 
-                your CPF using two line graphs per simulation run. The first line graph shows the total account balance, 
-                which is the sum of the Ordinary, Special, Retirement and Medisave accounts. 
-                The second line graph shows the sum of the withdrawable amount, which is the sum of the 
-                Ordinary and Special accounts only after deducting the Full Retirement Sum at the start of your
-                55th Year (the graph shows the transfer at X-axis value 54, which means the end of 54th Year.</p>
-            <hr>
-
-            <div>
-                <div class="row">
-                    <div class="col-sm-12" style=" height: 400px; width: 100%;">
-                        <canvas id="chart_TOTAL_BALANCES"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>		
-			<h6 class="card-title" id="Print_TotalBalances"></h6>
+                <br>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Just before your 65th birthday!</h5>                        
+                            <div class="chart-container">
+                                <canvas id="doughnut_TOTAL_BALANCES_65"></canvas>
+                            </div>
+                            <p class="card-text" id="Print_TotalBalances65"></p>
+                            <!-- <a href="https://www.cpf.gov.sg/member/infohub/be-ready/meeting-my-retirement-needs?utm_source=gle&utm_medium=sem&utm_campaign=brd" class="btn btn-primary">Meeting retirement needs</a> -->
+                            <div class="col text-center"><a class="btn btn-success">See details</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Account Balance Accumulation</h5>
+                    
+                            <p class="card-text">The below figure shows the total account balance for 
+                                your CPF using two line graphs per simulation run. The first line graph shows the total account balance, 
+                                which is the sum of the Ordinary, Special, Retirement and Medisave accounts. 
+                                The second line graph shows the sum of the Ordinary and Special accounts. After 55 this becomes the amount you can withdraw after 
+                                deducting the Full Retirement Sum.</p>
+                                <div style=" height: 400px; width: 100%;">
+                                    <canvas id="chart_TOTAL_BALANCES"></canvas>
+                                </div>
+                                <h6 class="card-title" id="Print_TotalBalances"></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-	</div> -->
+    </div>
 </div>
