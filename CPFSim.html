@@ -1040,6 +1040,30 @@ function CollapseInfo2()
         </form>
 </div>
 <br>
+
+<!-- <div class="container-md" id="analysis_area1" style="display: block;">
+    <h5 class="card-header text-white bg-danger mb-3">Simulation Results</h5>
+</div>
+
+<div class="container-md" id="analysis_area" style="display: none;">
+    <div class="card">
+        <div class="card-header">
+            <h6>Featured</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">                
+                <div class="col-md-8">
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                </div>
+                <div class="col-md-4">
+                    <p>Finally, indicate whether or not you would allow the CPF simulator to automatically transfer your ordinary account balance to your special account until your FRS is reached. You can compare your CPF outputs based on allowed or not allowed settings. Try yourself and see the various outputs of the simulator. By default, this value is set to false.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
 <div class="container-md" id="analysis_area" style="display: none;">
     <h5 class="card-header text-white bg-danger mb-3">Simulation Results</h5>
 
@@ -1054,8 +1078,12 @@ function CollapseInfo2()
                                 <canvas id="doughnut_TOTAL_BALANCES_55"></canvas>
                             </div>
                             <p class="card-text" id="Print_TotalBalances55"></p>
-                            <!-- <a href="https://www.cpf.gov.sg/member/retirement-income/retirement-withdrawals/withdrawing-for-immediate-retirement-needs" class="btn btn-primary">Understand withdrawal options</a> -->
-                            <div class="col text-center"><input type="button" class="btn btn-secondary" value="See Details" onclick="CollapseInfo()"></div>
+                            <hr>
+                            <p class="card-text" id="Print_TotalBalances55_Details"></p>
+                            <div class="col text-center">
+                                <a href="https://www.cpf.gov.sg/member/retirement-income/retirement-withdrawals/withdrawing-for-immediate-retirement-needs" class="btn btn-primary">Understand withdrawal options</a>
+                            </div>
+                            <!-- <div class="col text-center"><input type="button" class="btn btn-secondary" value="See Details" onclick="CollapseInfo()"></div> -->
                         </div>
                     </div>
                 </div>
@@ -1068,23 +1096,13 @@ function CollapseInfo2()
                                 <canvas id="doughnut_TOTAL_BALANCES_65"></canvas>
                             </div>
                             <p class="card-text" id="Print_TotalBalances65"></p>
-                            <!-- <a href="https://www.cpf.gov.sg/member/infohub/be-ready/meeting-my-retirement-needs?utm_source=gle&utm_medium=sem&utm_campaign=brd" class="btn btn-primary">Meeting retirement needs</a> -->
-                            <div class="col text-center"><input type="button" class="btn btn-secondary" value="See Details" onclick="CollapseInfo2()"></div>
+                            <hr>
+                            <p class="card-text" id="Print_TotalBalances65_Details"></p>
+                            <div class="col text-center">
+                                <a href="https://www.cpf.gov.sg/member/infohub/be-ready/meeting-my-retirement-needs?utm_source=gle&utm_medium=sem&utm_campaign=brd" class="btn btn-primary">Meeting retirement needs</a>
+                            </div>
+                            <!-- <div class="col text-center"><input type="button" class="btn btn-secondary" value="See Details" onclick="CollapseInfo2()"></div> -->
                         </div>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card card-body" id="collapseExample" style="display: none">
-                        <p class="card-text" id="Print_TotalBalances55_Details"></p>
-                    </div>
-                </div>
-                <br>
-                <div class="col-md-6">
-                    <div class="card card-body" id="collapseExample2" style="display: none">
-                        <p class="card-text" id="Print_TotalBalances65_Details"></p>
                     </div>
                 </div>
             </div>
