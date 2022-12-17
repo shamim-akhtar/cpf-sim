@@ -1,5 +1,20 @@
 # CPF Simulator
 
+<p align='left'>
+  <a href="#">
+    <img src="https://visitor-badge.glitch.me/badge?page_id=cpf-sim.visitor-badge" />        
+  </a>
+  <a href="https://www.linkedin.com/in/shamim-akhtar/">
+    <img src="https://img.shields.io/badge/linkedin-%230077B5.svg?&flat-square&logo=linkedin&logoColor=white" />
+  </a>
+  <a href="mailto:shamim.akhtar@gmail.com">
+    <img src="https://img.shields.io/badge/Gmail-D14836?flat-square&logo=gmail&logoColor=white" />        
+  </a>
+  <a href="https://www.facebook.com/faramiraSG/">
+    <img src="https://img.shields.io/badge/Facebook-1877F2?flat-square&logo=facebook&logoColor=white" />        
+  </a>
+</p>
+
 This CPF Simulator simulates the CPF accounts based on publicly available information. You can use this simulator to optimize your CPF account outputs by comparing and contrasting across multiple simulation runs.
 
 You can run the CPF simulator multiple times with different names and different inputs, and then you can compare the account outputs based on the inputs you keyed in.
