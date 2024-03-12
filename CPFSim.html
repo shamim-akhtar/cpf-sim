@@ -78,6 +78,7 @@
   var data_collection_array = new Array();
   var name_array = new Array();
   var chart_total_balances = null;
+  var chart_total_accounts = null;
   var chart_doughnut1 = null;
   var chart_doughnut2 = null;
   // var myform = null;
@@ -568,6 +569,106 @@
     chart_total_balances.update();
   }
 
+  function DrawChart_TotalAccounts() {
+    var labels = [];
+    var balances_oa = [];
+    var balances_sa = [];
+    var balances_ma = [];
+    var balances_ra = [];
+
+    var n = data_collection_array.length - 1;
+    var data_collection = data_collection_array[data_collection_array.length - 1];
+    var name = name_array[n];
+    for (var i in data_collection) {
+      labels.push(data_collection[i]["age"]);
+      var oa = data_collection[i]["OA"][3];
+      balances_oa.push(
+        {
+          x: data_collection[i]["age"],
+          y: toFixed(oa, 2)
+        });
+
+      var sa = data_collection[i]["SA"][3];
+      balances_sa.push(
+        {
+          x: data_collection[i]["age"],
+          y: toFixed(sa, 2)
+        });
+
+      var ma = data_collection[i]["MA"][3];
+      balances_ma.push(
+        {
+          x: data_collection[i]["age"],
+          y: toFixed(ma, 2)
+        });
+
+      var ra = data_collection[i]["RA"][3];
+      balances_ra.push(
+        {
+          x: data_collection[i]["age"],
+          y: toFixed(ra, 2)
+        });
+    }
+
+    var newDataSet1 =
+    {
+      label: name + " OA Balance",
+      data: balances_oa,
+      fill: false,
+
+      borderColor: getRandomColor(),
+      backgroundColor: getRandomColor(),
+      borderCapStyle: 'square',
+      borderWidth: 2,
+      pointRadius: 1.5
+    };
+
+    var newDataSet2 =
+    {
+      label: name + " SA Balance",
+      data: balances_sa,
+      fill: false,
+
+      borderColor: getRandomColor(),
+      backgroundColor: getRandomColor(),
+      borderCapStyle: 'square',
+      borderWidth: 2,
+      pointRadius: 1.5
+    };
+
+    var newDataSet3 =
+    {
+      label: name + " MA Balance",
+      data: balances_ma,
+      fill: false,
+
+      borderColor: getRandomColor(),
+      backgroundColor: getRandomColor(),
+      borderCapStyle: 'square',
+      borderWidth: 2,
+      pointRadius: 1.5
+    };
+
+    var newDataSet4 =
+    {
+      label: name + " RA Balance",
+      data: balances_ra,
+      fill: false,
+
+      borderColor: getRandomColor(),
+      backgroundColor: getRandomColor(),
+      borderCapStyle: 'square',
+      borderWidth: 2,
+      pointRadius: 1.5
+    };
+    chart_total_accounts.data.labels = labels;
+    chart_total_accounts.data.datasets.push(newDataSet1);
+    chart_total_accounts.data.datasets.push(newDataSet2);
+    chart_total_accounts.data.datasets.push(newDataSet3);
+    chart_total_accounts.data.datasets.push(newDataSet4);
+    chart_total_accounts.update();
+  }
+
   function CreateChart_TotalBalances() {
     if (chart_total_balances != null) return;
 
@@ -592,7 +693,7 @@
       title:
       {
         display: true,
-        text: 'Total Account Balance Comparison'
+        text: 'Account Balance'
       },
       responsive: true,
       maintainAspectRatio: false,
@@ -652,6 +753,90 @@
     document.getElementById('chart_TOTAL_BALANCES').style.display = "none";
   }
 
+  function CreateChart_TotalAccounts() {
+    if (chart_total_accounts != null) return;
+
+    var mydata =
+    {
+      labels: [],
+      datasets: []
+    };
+    var ctx = document.getElementById('chart_TOTAL_ACCOUNTS');
+    var chartOptions =
+    {
+      legend:
+      {
+        display: true,
+        position: 'bottom',
+        labels:
+        {
+          boxWidth: 15,
+          fontColor: 'black'
+        }
+      },
+      title:
+      {
+        display: true,
+        text: 'Account Balance'
+      },
+      responsive: true,
+      maintainAspectRatio: false,
+      scales:
+      {
+        yAxes: [
+          {
+            ticks:
+            {
+              beginAtZero: true,
+              callback: function (value, index, values) {
+                var ranges =
+                  [
+                    { divider: 1e6, suffix: 'M' },
+                    { divider: 1e3, suffix: 'k' }
+                  ];
+                function formatNumber(n) {
+                  for (var i = 0; i < ranges.length; i++) {
+                    if (n >= ranges[i].divider) {
+                      return (n / ranges[i].divider).toString() + ranges[i].suffix;
+                    }
+                  }
+                  return n;
+                }
+                return '$' + formatNumber(value);
+              }
+            }
+          }]
+      },
+      tooltips:
+      {
+        enabled: true,
+        mode: 'single',
+        callbacks:
+        {
+          title: function (tooltipItems, data) {
+            var label = data.datasets[tooltipItems[0].datasetIndex].label || '';
+            return label; //"Age: " + tooltipItems[0].xLabel;
+          },
+          label: function (tooltipItems, data) {
+            var label = data.datasets[tooltipItems.datasetIndex].label || '';
+            if (label) {
+              label += ': ';
+            }
+            return " Age:" + tooltipItems.xLabel + " | " +
+              tooltipItems.yLabel.toLocaleString("en-SG", { style: "currency", currency: "SGD" });
+          }
+        }
+      }
+    };
+    chart_total_accounts = new Chart(ctx,
+      {
+        type: 'line',
+        data: mydata,
+        options: chartOptions
+      });
+    document.getElementById('chart_TOTAL_ACCOUNTS').style.display = "none";
+  }
+
   function RunSimulation() {
     data_collection_array = new Array();
     name_array = new Array();
@@ -669,17 +854,24 @@
       chart_total_balances.data.datasets = [];
       chart_total_balances.update();
     }
+    if (chart_total_accounts != null) {
+      chart_total_accounts.data.datasets = [];
+      chart_total_accounts.update();
+    }
 
     document.getElementById("analysis_area").style.display = "none";
 
     CreateChart_TotalBalances();
+    CreateChart_TotalAccounts();
     Simulate();
 
     DrawChart_TotalBalances();
+    DrawChart_TotalAccounts();
     Print_TotalBalances_New();
 
     document.getElementById("analysis_area").style.display = "block";
     document.getElementById('chart_TOTAL_BALANCES').style.display = "block";
+    document.getElementById('chart_TOTAL_ACCOUNTS').style.display = "block";
     document.getElementById('doughnut_TOTAL_BALANCES_55').style.display = "block";
     document.getElementById('doughnut_TOTAL_BALANCES_65').style.display = "block";
   }
@@ -700,6 +892,10 @@
     if (chart_total_balances != null) {
       chart_total_balances.destroy();
       chart_total_balances = null;
+    }
+    if (chart_total_accounts != null) {
+      chart_total_accounts.destroy();
+      chart_total_accounts = null;
     }
 
     document.getElementById("analysis_area").style.display = "none";
@@ -1033,6 +1229,25 @@
             <canvas id="chart_TOTAL_BALANCES"></canvas>
           </div>
           <h6 class="card-title" id="Print_TotalBalances"></h6>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Account Balances</h5>
+
+          <p class="card-text">
+            The below figure shows the total account balance for
+            your Ordinary, Special, Medisave and Retirement Accounts.
+          </p>
+          <div style=" height: 400px; width: 100%;">
+            <canvas id="chart_TOTAL_ACCOUNTS"></canvas>
+          </div>
+          <h6 class="card-title" id="Print_TotalAccounts"></h6>
         </div>
       </div>
     </div>
