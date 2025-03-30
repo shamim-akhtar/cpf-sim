@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CPF Simulator</title>
+  <!-- External CSS Libraries -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container-md" style="max-width: 1200px; margin: 0 auto;">
+    <form id="simulator-form" class="needs-validation" method="post" novalidate>
+      <div class="card">
+        <h6 class="card-header text-white bg-primary mb-3">Basic Inputs</h6>
+        <div class="card-body">
+          <p class="card-text">Key in the basic parameters needed for the simulation.</p>
+          <hr>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputName">Simulation Name</label>
+            <div class="col-sm-7">
+              <input type="text" class="form-control" id="inputName" value="Simulation 1" required>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputAge">Age</label>
+            <div class="col-sm-7">
+              <input type="number" class="form-control" id="inputAge" value="30" required min="18" max="65">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputSalary">Salary (SGD)</label>
+            <div class="col-sm-7">
+              <input type="number" class="form-control" id="inputSalary" value="3000.00" required step="0.01" min="500" max="6000">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputBonus">Bonus (months)</label>
+            <div class="col-sm-7">
+              <input type="number" class="form-control" id="inputBonus" value="1">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputCash">Monthly Top-up</label>
+            <div class="col-sm-7">
+              <input type="number" class="form-control" id="inputCash" value="0.00" required step="0.01" min="0.00" max="5000.00">
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-header text-white bg-success"><h6>Starting Account Balance</h6></div>
+        <div class="card-body">
+          <p class="card-text">Enter your CPF account balances. You can find this information from your CPF account.</p>
+          <hr>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputOA">Ordinary Account</label>
+            <div class="col-sm-7">
+              <input type="number" class="form-control" id="inputOA" value="0.00" required step="0.01" min="0.00" max="500000.00">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputSA">Special Account</label>
+            <div class="col-sm-7">
+              <input type="number" class="form-control" id="inputSA" value="0.00" required step="0.01" min="0.00" max="500000.00">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputMA">Medisave Account</label>
+            <div class="col-sm-7">
+              <input type="number" class="form-control" id="inputMA" value="0.00" required step="0.01" min="0.00" max="500000.00">
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-header text-white bg-secondary mb-3"><h6>BHS &amp; FRS Rates of Increase</h6></div>
+        <div class="card-body">
+          <p class="card-text">Enter the expected growth rate of the Basic Healthcare Sum (BHS) and the Full Retirement Sum (FRS). A growth rate of 3-4% is a good choice.</p>
+          <hr>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">FRS Rate</label>
+            <div class="col-sm-7">
+              <select class="custom-select" id="inputFRSRate">
+                <option value="0.0">0.0</option>
+                <option value="0.5">0.5</option>
+                <option value="1.0">1.0</option>
+                <option value="1.5">1.5</option>
+                <option value="2.0">2.0</option>
+                <option value="2.5">2.5</option>
+                <option value="3.0">3.0</option>
+                <option value="3.5">3.5</option>
+                <option value="4.0">4.0</option>
+                <option value="4.5">4.5</option>
+                <option value="5.0">5.0</option>
+                <option value="5.5">5.5</option>
+                <option value="6.0">6.0</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">BHS Rate</label>
+            <div class="col-sm-7">
+              <select class="custom-select" id="inputBHSRate">
+                <option value="0.0">0.0</option>
+                <option value="0.5">0.5</option>
+                <option value="1.0">1.0</option>
+                <option value="1.5">1.5</option>
+                <option value="2.0">2.0</option>
+                <option value="2.5">2.5</option>
+                <option value="3.0">3.0</option>
+                <option value="3.5">3.5</option>
+                <option value="4.0">4.0</option>
+                <option value="4.5">4.5</option>
+                <option value="5.0">5.0</option>
+                <option value="5.5">5.5</option>
+                <option value="6.0">6.0</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-header text-white bg-warning mb-3"><h6>Deductions</h6></div>
+        <div class="card-body">
+          <p class="card-text">Enter the deductions from your CPF accounts. Typically this will be for housing, Medishield premium, ElderShield premium, Dependent Protection Scheme (DPS) premium and Home Protection Scheme (HPS) premium. By default, all these values are set to zero. You can change this and key in the exact amount, and the month it is deducted from your CPF.</p>
+          <hr>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right" for="inputHousing">Housing</label>
+            <div class="col-sm-7">
+              <input type="number" class="form-control" id="inputHousing" value="0.00" required step="0.01" min="0" max="1500">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">DPS</label>
+            <div class="col-sm-4">
+              <input type="number" class="form-control" id="inputDPS" value="0.00" required step="0.01" min="0.00" max="500.00">
+            </div>
+            <div class="col-sm-3">
+              <select class="custom-select" id="inputDPSM">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">HPS</label>
+            <div class="col-sm-4">
+              <input type="number" class="form-control" id="inputHPS" value="0.00" required step="0.01" min="0.00" max="500.00">
+            </div>
+            <div class="col-sm-3">
+              <select class="custom-select" id="inputHPSM">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">Medishield</label>
+            <div class="col-sm-4">
+              <input type="number" class="form-control" id="inputMedishield" value="0.00" required step="0.01" min="0" max="2500">
+            </div>
+            <div class="col-sm-3">
+              <select class="custom-select" id="inputMedishieldM">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label text-right">Eldershield</label>
+            <div class="col-sm-4">
+              <input type="number" class="form-control" id="inputEldershield" value="0.00" required step="0.01" min="0" max="2500">
+            </div>
+            <div class="col-sm-3">
+              <select class="custom-select" id="inputEldershieldM">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-header text-white bg-info mb-3"><h6>Allow OA to SA Transfer</h6></div>
+        <div class="card-body">
+          <p class="card-text">
+            Finally, indicate whether or not you would allow the CPF simulator to automatically
+            transfer your ordinary account balance to your special account until your FRS is reached.
+            You can compare your CPF outputs based on allowed or not allowed settings. Try yourself
+            and see the various outputs of the simulator. By default, this value is set to false.
+          </p>
+          <hr>
+          <div class="form-group row">
+            <label class="col-sm-2">
+              <input type="radio" class="mr-1" name="allow_oa_to_sa" id="allow_oa_sa"> Yes
+            </label>
+            <label class="col-sm-2">
+              <input type="radio" class="mr-1" name="allow_oa_to_sa" checked>No
+            </label>
+          </div>
+          <div class="form-group">
+            <input type="button" class="btn btn-primary" value="Simulate" onclick="RunSimulation()">
+            <input type="button" class="btn btn-secondary" value="Reset All Simulations" onclick="ClearAll()">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <br>
+  <div class="container-md" id="analysis_area"  style="max-width: 1200px; margin: 0 auto; display: none;">
+    <h5 class="card-header text-white bg-danger mb-3">Simulation Results</h5>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Just before your 55th birthday!</h5>
+            <div class="chart-container">
+              <canvas id="doughnut_TOTAL_BALANCES_55"></canvas>
+            </div>
+            <p class="card-text" id="Print_TotalBalances55"></p>
+            <hr>
+            <p class="card-text" id="Print_TotalBalances55_Details"></p>
+            <div class="col text-center">
+              <a href="https://www.cpf.gov.sg/member/retirement-income/retirement-withdrawals/withdrawing-for-immediate-retirement-needs" class="btn btn-primary">Understand withdrawal options</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Just before your 65th birthday!</h5>
+            <div class="chart-container">
+              <canvas id="doughnut_TOTAL_BALANCES_65"></canvas>
+            </div>
+            <p class="card-text" id="Print_TotalBalances65"></p>
+            <hr>
+            <p class="card-text" id="Print_TotalBalances65_Details"></p>
+            <div class="col text-center">
+              <a href="https://www.cpf.gov.sg/member/infohub/be-ready/meeting-my-retirement-needs?utm_source=gle&utm_medium=sem&utm_campaign=brd" class="btn btn-primary">Meeting retirement needs</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Account Balance Accumulation</h5>
+            <p class="card-text">
+              The below figure shows the total account balance for
+              your CPF using two line graphs per simulation run. The first line graph shows the total account balance,
+              which is the sum of the Ordinary, Special, Retirement and Medisave accounts.
+              The second line graph shows the sum of the Ordinary and Special accounts. After 55, this becomes the amount you can withdraw after
+              deducting the Full Retirement Sum.
+            </p>
+            <div style="height: 400px; width: 100%;">
+              <canvas id="chart_TOTAL_BALANCES"></canvas>
+            </div>
+            <h6 class="card-title" id="Print_TotalBalances"></h6>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Account Balances</h5>
+            <p class="card-text">
+              The below figure shows the total account balance for
+              your Ordinary, Special, Medisave and Retirement Accounts.
+            </p>
+            <div style="height: 400px; width: 100%;">
+              <canvas id="chart_TOTAL_ACCOUNTS"></canvas>
+            </div>
+            <h6 class="card-title" id="Print_TotalAccounts"></h6>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Assumptions</h5>
+            <p class="card-text">
+              <ul>
+                <li>Bonus is added in the first month of the year.</li>
+                <li>The additional 1% and extra additional 1% interest given by the government is not taken into the calculation.</li>
+                <li>Interests are calculated on a monthly basis but added only at the end of the year.</li>
+                <li>Once MA reaches BHS limit and age is less than 55 the contributions to Medisave and interests from Medisave are transferred to SA. If SA reached FRS limit then the amounts are transferred to OA.</li>
+                <li>Once MA reaches BHS limit and age is more than 55 the contributions to Medisave and interests from Medisave are transferred to RA. If RA reached FRS limit then the amounts are transferred to OA.</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Disclaimer</h5>
+            <p class="card-text font-italic">
+              I am not a financial advisor. Neither am I trying to sell you anything.
+              This CPF simulator is for educational purposes. The calculations used in this simulator
+              are derived from publicly available information. It projects the CPF account amounts
+              based on the inputs you provide. No data is retained for the working of the simulator.
+              The entire calculation takes place on the browser, and no information is sent to the server.
+              If you find any problems or flaws, please send me a note via comments or email.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- External JavaScript Libraries -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <!-- Custom JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
