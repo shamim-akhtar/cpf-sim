@@ -1,103 +1,10 @@
-/* Global Styles */
-* {
-    box-sizing: border-box;
-  }
-  
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: #f8f9fa;
-    color: #212529;
-  }
-  
-  /* Wrapper to center content and restrict width */
-  .wrapper {
+@media (min-width: 1200px) {
+  .container {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
   }
-  
-  /* Card Styles */
-  .card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-header {
-    padding: 10px 15px;
-    color: #fff;
-    font-size: 1.1em;
-    font-weight: bold;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-  }
-  
-  /* Header color variants */
-  .card-header.primary { background: #007bff; }    /* Blue */
-  .card-header.success { background: #28a745; }    /* Green */
-  .card-header.secondary { background: #6c757d; }  /* Grey */
-  .card-header.warning { background: #ffc107; }    /* Yellow */
-  .card-header.info { background: #17a2b8; }       /* Teal */
-  .card-header.danger { background: #dc3545; }     /* Red */
-  
-  .card-body {
-    padding: 15px;
-  }
-  
-  /* Form Styles */
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  .form-group input,
-  .form-group select {
+
+  .chart-container {
     width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    height: 100%;
   }
-  
-  /* Horizontal Rule */
-  hr {
-    border: none;
-    border-top: 1px solid #ddd;
-    margin: 15px 0;
-  }
-  
-  /* Button Styles */
-  input[type="button"],
-  button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-  }
-  
-  .btn-primary {
-    background: #007bff;
-    color: #fff;
-  }
-  
-  .btn-secondary {
-    background: #6c757d;
-    color: #fff;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .wrapper {
-      padding: 10px;
-    }
-  }
-  
+}

@@ -21,27 +21,14 @@ function toFixed(value, preci) {
     return color;
   }
   
-  const RetirementAge = 65;
   // As of 2024
-  const CONST_SALARY_CAP = 6800.0;
-  
-  function getAllocationRate(age) {
-    if (age < 35) return [0.23, 0.06, 0.08];
-    if (age >= 35 && age < 45) return [0.21, 0.07, 0.09];
-    if (age >= 45 && age < 50) return [0.19, 0.08, 0.10];
-    if (age >= 50 && age < 55) return [0.15, 0.115, 0.105];
-    if (age >= 55 && age < 60) return [0.12, 0.085, 0.105];
-    if (age >= 60 && age < 65) return [0.035, 0.08, 0.105];
-    if (age >= 65 && age < 70) return [0.01, 0.05, 0.105];
-    if (age >= 70) return [0.01, 0.01, 0.105];
-  }
-  
+    
   function getContrib(age, sal) {
-    var allocRate = getAllocationRate(age);
+    var allocRate = CPFConfig.getAllocationRate(age);
     return [
-      sal > CONST_SALARY_CAP ? allocRate[0] * CONST_SALARY_CAP : allocRate[0] * sal,
-      sal > CONST_SALARY_CAP ? allocRate[1] * CONST_SALARY_CAP : allocRate[1] * sal,
-      sal > CONST_SALARY_CAP ? allocRate[2] * CONST_SALARY_CAP : allocRate[2] * sal,
+      sal > CPFConfig.CONST_SALARY_CAP ? allocRate[0] * CPFConfig.CONST_SALARY_CAP : allocRate[0] * sal,
+      sal > CPFConfig.CONST_SALARY_CAP ? allocRate[1] * CPFConfig.CONST_SALARY_CAP : allocRate[1] * sal,
+      sal > CPFConfig.CONST_SALARY_CAP ? allocRate[2] * CPFConfig.CONST_SALARY_CAP : allocRate[2] * sal,
       0.0
     ];
   }
@@ -179,7 +166,8 @@ function toFixed(value, preci) {
                 balance[1] += amt;
                 tfr[1] += amt;
               }
-            } else {
+            } 
+            else {
               // After 55, SA is closed:
               balance[0] += contrib[0];
               balance[2] += contrib[2];
@@ -207,7 +195,8 @@ function toFixed(value, preci) {
                   balance[1] += contrib[1];
                   balance[2] += contrib[2];
                   balance[3] += contrib[3];
-                } else {
+                } 
+                else {
                   balance[0] += contrib[0];
                   balance[2] += contrib[2];
                   balance[3] += (contrib[1] + contrib[3]);
@@ -224,7 +213,8 @@ function toFixed(value, preci) {
                 balance[1] += contrib[1];
                 balance[2] += contrib[2];
                 balance[3] += contrib[3];
-              } else {
+              } 
+              else {
                 balance[0] += contrib[0];
                 balance[2] += contrib[2];
                 balance[3] += (contrib[1] + contrib[3]);
@@ -289,12 +279,13 @@ function toFixed(value, preci) {
                     // Otherwise, add only what’s needed to reach FRS, and the excess goes to OA.
                     var needed = currentFRS - balance[3];
                     if (needed > 0) {
-                    balance[3] += needed;
-                    balance[0] += (transferAmount - needed);
-                    } else {
-                    // In the unlikely event RA is already at or above FRS,
-                    // send all SA funds to OA.
-                    balance[0] += transferAmount;
+                        balance[3] += needed;
+                        balance[0] += (transferAmount - needed);
+                    } 
+                    else {
+                        // In the unlikely event RA is already at or above FRS,
+                        // send all SA funds to OA.
+                        balance[0] += transferAmount;
                     }
                 }
             }
@@ -315,7 +306,7 @@ function toFixed(value, preci) {
       name_array.push(SIMULATION_NAME);
     }
   
-    getProjectedValues(AGE, 71500.0, 205800, RetirementAge - AGE, BHS_RATE / 100, FRS_RATE / 100, ALLOW_OA_SA_TFR);
+    getProjectedValues(AGE, 71500.0, 205800, CPFConfig.RetirementAge - AGE, BHS_RATE / 100, FRS_RATE / 100, ALLOW_OA_SA_TFR);
   }
   
   function Print_TotalBalances_New() {
