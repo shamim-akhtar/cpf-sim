@@ -14,7 +14,7 @@
 
 # CPF Simulator
 
-A responsive web-based CPF Simulator designed to calculate projected CPF balances based on user inputs. Built using HTML, JavaScript, Bootstrap, and Chart.js. 
+A responsive web-based CPF Simulator was designed to calculate projected CPF balances based on user inputs. Built using HTML, JavaScript, Bootstrap, and Chart.js. 
 
 >[!IMPORTANT]
 >Important Note**
@@ -45,7 +45,7 @@ This CPF Simulator is created for educational purposes only and serves as a tool
 - **Chart.js:** For visual representation of account balances.
 
 ## 🚀 Live Demo
-Check out the live version of the CPF Simulator here: [CPF Simulator](https://YourUsername.github.io/CPF-Simulator/)
+Check out the live version of the CPF Simulator here: [CPF Simulator](https://shamim-akhtar.github.io/cpf-sim/)
 
 ## 📌 Usage
 1. Clone this repository or download the files.
