@@ -474,12 +474,11 @@ var CPFConfig = {
       "Your projected account balance would be <b class=\"text-danger\">" +
       acc65[0].toLocaleString("en-SG", { style: "currency", currency: "SGD" }) +
       "</b> in Ordinary Account (OA), <b class=\"text-primary\">" +
-      acc65[1].toLocaleString("en-SG", { style: "currency", currency: "SGD" }) +
-      "</b> in Special Account (SA), <b class=\"text-warning\">" +
+      
       acc65[2].toLocaleString("en-SG", { style: "currency", currency: "SGD" }) +
       "</b> in Medisave Account (MA), and <b class=\"text-info\">" +
       acc65[3].toLocaleString("en-SG", { style: "currency", currency: "SGD" }) +
-      "</b> in Retirement Account (RA). It assumes that you did not withdraw any money from your CPF from age 55 until 65.";
+      "</b> in Retirement Account (RA). <br> It assumes that you did not withdraw any money from your CPF from age 55 until 65.";
   
     // Doughnut charts
     if (chart_doughnut1 == null) {
