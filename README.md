@@ -23,6 +23,7 @@ This CPF Simulator is created for educational purposes only and serves as a tool
 >
 >While this simulator aims to provide useful estimates, it is not a substitute for official CPF statements or professional financial advice. Always refer to your official CPF account or consult a financial advisor for accurate and personalized financial planning.
 
+>[!TIP]
 >**Benefit to Users:** This simulator helps you visualize your CPF growth over time, understand how different contributions and interest rates impact your balances, and make better-informed decisions about your retirement planning.
 
 ---
