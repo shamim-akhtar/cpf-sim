@@ -15,6 +15,8 @@ Found an issue? Have a suggestion? Feel free to open an issue or reach out!
 
 # CPF Simulator
 
+[![](https://github.com/shamim-akhtar/cpf-sim/blob/main/images/image_02.PNG)](https://shamim-akhtar.github.io/cpf-sim/)
+
 A responsive web-based CPF Simulator was designed to calculate projected CPF balances based on user inputs. Built using HTML, JavaScript, Bootstrap, and Chart.js. 
 
 >[!IMPORTANT]
