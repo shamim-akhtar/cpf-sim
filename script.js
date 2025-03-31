@@ -1008,49 +1008,84 @@ function Print_Individual()
     document.getElementById('Print_Individual').innerHTML = txt;
 }
   
-  // The main “RunSimulation” button callback
+  // // The main “RunSimulation” button callback
+  // function RunSimulation() {
+  //   data_collection_array = [];
+  //   name_array = [];
+  
+  //   // Clear existing charts so that each run is fresh
+  //   if (chart_doughnut1 != null) { chart_doughnut1.destroy(); chart_doughnut1 = null; }
+  //   if (chart_doughnut2 != null) { chart_doughnut2.destroy(); chart_doughnut2 = null; }
+  //   if (chart_total_balances != null) {
+  //     chart_total_balances.data.datasets = [];
+  //     chart_total_balances.update();
+  //   }
+  //   if (chart_total_accounts != null) {
+  //     chart_total_accounts.data.datasets = [];
+  //     chart_total_accounts.update();
+  //   }
+  //   document.getElementById("analysis_area").style.display = "none";
+  
+  //   // Create empty charts if not present
+  //   CreateChart_TotalBalances();
+  //   CreateChart_TotalAccounts();
+  
+  //   // Run the core simulation
+  //   Simulate();
+  
+  //   // Plot line charts
+  //   DrawChart_TotalBalances();
+  //   DrawChart_TotalAccounts();
+  
+  //   // Update final 55/65 card displays
+  //   Print_TotalBalances_New();
+  
+  //   // Show table prints
+  //   Print_Accounts();
+  //   // Print_Individual();
+  
+  //   // Show final area
+  //   document.getElementById("analysis_area").style.display = "block";
+  //   document.getElementById('chart_TOTAL_BALANCES').style.display = "block";
+  //   document.getElementById('chart_TOTAL_ACCOUNTS').style.display = "block";
+  //   document.getElementById('doughnut_TOTAL_BALANCES_55').style.display = "block";
+  //   document.getElementById('doughnut_TOTAL_BALANCES_65').style.display = "block";
+  // }
   function RunSimulation() {
     data_collection_array = [];
     name_array = [];
   
-    // Clear existing charts so that each run is fresh
     if (chart_doughnut1 != null) { chart_doughnut1.destroy(); chart_doughnut1 = null; }
     if (chart_doughnut2 != null) { chart_doughnut2.destroy(); chart_doughnut2 = null; }
-    if (chart_total_balances != null) {
-      chart_total_balances.data.datasets = [];
-      chart_total_balances.update();
-    }
-    if (chart_total_accounts != null) {
-      chart_total_accounts.data.datasets = [];
-      chart_total_accounts.update();
-    }
-    document.getElementById("analysis_area").style.display = "none";
-  
-    // Create empty charts if not present
+    if (chart_total_balances != null) { chart_total_balances.data.datasets = []; chart_total_balances.update(); }
+    if (chart_total_accounts != null) { chart_total_accounts.data.datasets = []; chart_total_accounts.update(); }
+
     CreateChart_TotalBalances();
     CreateChart_TotalAccounts();
   
-    // Run the core simulation
     Simulate();
-  
-    // Plot line charts
     DrawChart_TotalBalances();
     DrawChart_TotalAccounts();
-  
-    // Update final 55/65 card displays
     Print_TotalBalances_New();
-  
-    // Show table prints
     Print_Accounts();
-    // Print_Individual();
-  
+
+    
     // Show final area
     document.getElementById("analysis_area").style.display = "block";
     document.getElementById('chart_TOTAL_BALANCES').style.display = "block";
     document.getElementById('chart_TOTAL_ACCOUNTS').style.display = "block";
     document.getElementById('doughnut_TOTAL_BALANCES_55').style.display = "block";
     document.getElementById('doughnut_TOTAL_BALANCES_65').style.display = "block";
-  }
+  
+    document.getElementById("simulator-form").style.display = "none";  // Hide form
+    document.getElementById("analysis_area").style.display = "block";  // Show results
+}
+
+function BackToForm() {
+    document.getElementById("simulator-form").style.display = "block";  // Show form
+    document.getElementById("analysis_area").style.display = "none";  // Hide results
+}
+
   
   // Reset everything
   function ClearAll() {
