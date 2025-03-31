@@ -10,6 +10,7 @@ var CPFConfig = {
     // Initial values for Basic Healthcare Sum (BHS) and Full Retirement Sum (FRS)
     currentBHS: 75500.0,
     currentFRS: 213800,
+    CPFAnnualLimit: 37740.0,
 
     // Function that returns allocation rates based on age.
     getAllocationRate: function(age) {
