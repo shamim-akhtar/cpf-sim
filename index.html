@@ -8,9 +8,37 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="./styles.css">
+  <!-- <link rel="stylesheet" href="./styles.css"> -->
+    <style>
+        body {
+        margin-bottom: 0px; /* No extra space needed for footer */
+        }
+        footer {
+        bottom: 0;
+        width: 100%;
+        padding: 10px;
+        border-top: 1px solid #e7e7e7;
+        text-align: center;
+        }
+        .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #433626; /* Dark background color */
+        padding: 10px;
+        border-radius: 5px;
+        color: white; /* White text for better contrast */
+        }
+        .footer-content p {
+        margin: 0;
+        }
+    </style>
+
 </head>
 <body>
+      <!-- Header -->
+  <header class="bg-primary text-white text-center py-5 mb-4">
+    <h2>CPF Simulator - Calculate Your Projected CPF Balances</h2>
+  </header>
   <div class="container-md" style="max-width: 1200px; margin: 0 auto;">
     <form id="simulator-form" class="needs-validation" method="post" novalidate>
       <div class="card">
@@ -350,10 +378,6 @@
   		</div>
   	</div>
   	<hr>
-	<div class="row">
-    	<div class="col-sm-12 text-center" style="background-color:white;"><h4>Individual Account Components with Age</h4></div>
-	</div>
-	<hr>
   	<div class="row">
     	<div class="col-sm-12">
 			<div class="container" id="Print_Individual"></div>
@@ -367,20 +391,39 @@
           <div class="card-body">
             <h5 class="card-title">Assumptions</h5>
             <p class="card-text">
-              <ul>
-                <li>Bonus is added in the first month of the year.</li>
-                <li>The additional 1% and extra additional 1% interest given by the government is not taken into the calculation.</li>
-                <li>Interests are calculated on a monthly basis but added only at the end of the year.</li>
-                <li>Once MA reaches BHS limit and age is less than 55 the contributions to Medisave and interests from Medisave are transferred to SA. If SA reached FRS limit then the amounts are transferred to OA.</li>
-                <li>Once MA reaches BHS limit and age is more than 55 the contributions to Medisave and interests from Medisave are transferred to RA. If RA reached FRS limit then the amounts are transferred to OA.</li>
-              </ul>
-            </p>
+                <ul>
+                  <li>Bonuses are credited at the start of each year, specifically in January.</li>
+                  <li>The additional 1% and extra additional 1% interest provided by the government are not included in the calculations.</li>
+                  <li>Interest is calculated monthly but only credited to the respective accounts at the end of the year.</li>
+                  <li><b>If age is below 55</b> and the SA has reached the Full Retirement Sum (FRS), the excess is redirected to the Ordinary Account (OA).</li>
+                  <li>
+                    When the Medisave Account (MA) balance exceeds the Basic Healthcare Sum (BHS) limit:
+                    <ul>
+                      <li><b>If age is below 55:</b> The excess contributions and interest from MA are transferred to the Special Account (SA). 
+                        <ul>
+                          <li>If the SA has not reached the Full Retirement Sum (FRS), the excess is fully transferred to SA.</li>
+                          <li>If the SA has reached the Full Retirement Sum (FRS), the excess is redirected to the Ordinary Account (OA).</li>
+                        </ul>
+                      </li>
+                      <li><b>If age is 55 or older:</b> The excess contributions and interest from MA are transferred to the Retirement Account (RA). 
+                        <ul>
+                          <li>If the RA has not reached the Full Retirement Sum (FRS), the excess is fully transferred to RA.</li>
+                          <li>If the RA has reached the Full Retirement Sum (FRS), the excess is redirected to the Ordinary Account (OA).</li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </p>
+              
+              
           </div>
         </div>
       </div>
     </div>
     <br>
-    <div class="row">
+
+    <!-- <div class="row">
       <div class="col-md-12">
         <div class="card">
           <div class="card-body">
@@ -396,13 +439,28 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
+    
+
   </div>
+<!-- Footer with Disclaimer -->
+
+<footer>
+    <div class="footer-content" style="max-width: 1200px; margin: 0 auto;">
+      <p>
+        <strong>Disclaimer:</strong> This CPF simulator is intended for educational purposes only. It is not financial advice and should not be considered as such. 
+        The calculations are based on publicly available information and the assumptions made by the developer. Results may differ from actual CPF account balances. 
+        No data is stored or transmitted; all calculations occur locally in your browser. If you find errors or have suggestions, feel free to reach out via comments or email.
+      </p>
+    </div>
+  </footer>
+
+
   <!-- External JavaScript Libraries -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
   <!-- Custom JavaScript -->
-  <script src="config.js"></script>
+  <!-- <script src="config.js"></script> -->
   <script src="script.js"></script>
 </body>
 </html>
