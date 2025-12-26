@@ -47,7 +47,9 @@ A modern, responsive web-based CPF Simulator designed to forecast CPF balances b
 
 * **Strict Contribution Caps:** Automatically caps total contributions (Mandatory Salary/Bonus + Voluntary Cash) at the annual limit of **$37,740**, preventing unrealistic projections.
 
-* **Detailed Ledger:** A transaction-level table showing annual breakdown of interest earned, contributions, and specific notes on fund transfers (e.g., `MA>SA`, `SA>RA`).
+* **Detailed Ledger:** A transaction-level table showing annual breakdown of interest earned, contributions, and specific notes on fund transfers (e.g., `MA>SA`, `SA>RA`, `Int` crediting).
+
+* **Advanced Deductions:** Granular control over monthly deductions including Housing, MediShield, ElderShield, DPS, and HPS.
 
 * **Payout Estimator:** Provides an approximate monthly CPF LIFE payout range starting at age 65, calculated based on the RA sum accumulated at age 55.
 
@@ -57,8 +59,9 @@ A modern, responsive web-based CPF Simulator designed to forecast CPF balances b
    * Ordinary Wage (OW) capped at **$8,000/month**.
    * Additional Wage (Bonus) capped based on the formula: `$102,000 - (Total Annual OW)`.
 
-2. **Interest Rates:**
+2. **Interest Rates & Crediting:**
    * Base rates used: OA (2.5%), SA/MA/RA (4.0%).
+   * **Compound Interest:** Interest is calculated monthly but credited annually at the end of the year.
    * *Note:* Extra interest tiers (e.g., extra 1% on first $60k) are excluded to provide a conservative estimate.
 
 3. **Overflow Logic:**
@@ -87,23 +90,28 @@ In the left sidebar, enter your current details:
 * **Age:** Your current age.
 * **Bonus:** Number of months of bonus (credited in January).
 * **Monthly Gross Salary:** Capped automatically at $8,000 for calculation.
-* **Voluntary Cash:** Any monthly cash top-up you wish to make (automatically limited by the remaining Annual Limit headroom).
 
 ### ✅ **Step 2: Current Balances**
 Enter your current CPF account balances for **OA**, **SA**, and **MA**.
 
 ### ✅ **Step 3: Projections & Options**
 * **Growth Rates:** Set your expected yearly growth rates for FRS and BHS (defaults to 3.5% and 4.0%).
-* **Housing Deduction:** Enter monthly mortgage payments paid via OA.
 * **Target ERS at 55?**: Check this toggle if you intend to set aside the **Enhanced Retirement Sum** (2x FRS) at age 55. If unchecked, the simulator defaults to the Full Retirement Sum (FRS).
 
-### ✅ **Step 4: Run Simulation**
+### ✅ **Step 4: Contributions & Deductions (Advanced)**
+Toggle the **"Show Advanced"** checkbox to reveal detailed input fields:
+* **Voluntary Cash:** Monthly cash top-ups (automatically limited by the remaining Annual Limit headroom).
+* **Housing Deduction:** Monthly mortgage payments paid via OA.
+* **Insurance Premiums:** Specify annual amounts and deduction months for MediShield, ElderShield, DPS, and HPS.
+* **OA to SA Transfer:** Enable auto-transfer of OA funds to SA (pre-55) to maximize interest.
+
+### ✅ **Step 5: Run Simulation**
 Click **Run Simulation**. The results on the right will update instantly.
 
-### ✅ **Step 5: Analyze Results**
+### ✅ **Step 6: Analyze Results**
 * **Snapshot Cards:** View your exact balances at **Age 55** (SA Closure event) and **Age 65** (Payout eligibility).
 * **Financial Summary:** Read a detailed textual analysis of your retirement readiness, including whether you met the FRS/ERS and your estimated monthly payout range.
-* **Detailed Ledger:** Scroll down to the table to see year-by-year entries, including exactly how much interest was earned and where your MA overflow funds went.
+* **Detailed Ledger:** Scroll down to the table to see year-by-year entries, verifying interest crediting (`Int`) and fund transfers.
 
 ---
 
