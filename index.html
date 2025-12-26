@@ -297,7 +297,7 @@
                             <p>I am not a financial advisor. Neither am I trying to sell you anything. This CPF simulator is for educational purposes. The calculations used in this simulator are derived from publicly available information. It projects the CPF account amounts based on the inputs you provide. No data is retained for the working of the simulator. The entire calculation takes place on the browser, and no information is sent to the server. If you find any problems or flaws, please send me a note via comments or email.</p>
                             <p class="border-t border-amber-200 pt-2">
                                 <strong>2026 Rules:</strong> Monthly OW Ceiling is $8,000. Total Annual Wage Ceiling is $102,000. Contribution Limit is strictly capped at $37,740 (Mandatory + Voluntary). SA closes at 55.
-                                <strong>Rates:</strong> Base interest (2.5% OA, 4.0% Others). Extra interest tiers excluded for conservatism.
+                            <strong>Rates:</strong> Base interest (2.5% OA, 4.0% Others). Extra interest tiers excluded for conservatism.
                             </p>
                         </div>
                     </div>
@@ -550,10 +550,8 @@
                 let yearNotes = [];
                 let totalContribThisYear = 0; 
                 let transfers = { MA_SA: 0, MA_OA: 0, MA_RA: 0, OA_SA: 0 };
-
-                // Grow Limits
-                currentBHS *= (1 + rates.bhsGrowth);
-                if (simAge <= 55) currentFRS *= (1 + rates.frsGrowth);
+                let totalHousingDed = 0; 
+                let totalVoluntaryCash = 0; 
 
                 // --- MONTHLY CYCLE ---
                 for (let m = 0; m < 12; m++) {
@@ -577,7 +575,7 @@
                         totalContribThisYear += actualTotal;
                     }
 
-                    // 2. Voluntary Cash (If headroom)
+                    // 2. Voluntary Cash (Enforce Annual Limit Check Before Adding)
                     if (totalContribThisYear < CPFConfig.ANNUAL_LIMIT && monthlyCash > 0) {
                         headroom = CPFConfig.ANNUAL_LIMIT - totalContribThisYear;
                         let actualCash = Math.min(monthlyCash, headroom);
@@ -593,30 +591,39 @@
                                 }
                             }
                             totalContribThisYear += actualCash;
+                            totalVoluntaryCash += actualCash;
                         }
                     }
 
-                    // 3. Deductions
+                    // 3. Deductions (Prioritized: Deduct from balance directly)
                     // Housing (OA)
                     if (housingDed > 0) {
-                        if (balances.OA >= housingDed) balances.OA -= housingDed;
+                        // Deduct max possible up to the amount needed
+                        let dedAmt = Math.min(balances.OA, housingDed);
+                        balances.OA -= dedAmt;
+                        totalHousingDed += dedAmt;
                     }
+                    
                     // Premiums
                     if (m === premiums.medishield.month && premiums.medishield.amt > 0) {
-                        if (balances.MA >= premiums.medishield.amt) { balances.MA -= premiums.medishield.amt; }
+                        let dedAmt = Math.min(balances.MA, premiums.medishield.amt);
+                        balances.MA -= dedAmt;
                     }
                     if (m === premiums.eldershield.month && premiums.eldershield.amt > 0) {
-                        if (balances.MA >= premiums.eldershield.amt) { balances.MA -= premiums.eldershield.amt; }
+                        let dedAmt = Math.min(balances.MA, premiums.eldershield.amt);
+                        balances.MA -= dedAmt;
                     }
                     if (m === premiums.dps.month && premiums.dps.amt > 0) {
-                        if (balances.OA >= premiums.dps.amt) { balances.OA -= premiums.dps.amt; }
+                        let dedAmt = Math.min(balances.OA, premiums.dps.amt);
+                        balances.OA -= dedAmt;
                     }
                     if (m === premiums.hps.month && premiums.hps.amt > 0) {
-                        if (balances.OA >= premiums.hps.amt) { balances.OA -= premiums.hps.amt; }
+                        let dedAmt = Math.min(balances.OA, premiums.hps.amt);
+                        balances.OA -= dedAmt;
                     }
 
                     // 4. OA to SA Transfer Logic (Auto)
-                    // Rule: Only if Age < 55, Enabled, and SA < FRS.
+                    // Rule: Only if Age < 55, Enabled, SA < FRS, and OA balance > 0 (after deductions)
                     if (allowOAToSA && !saIsClosed && balances.SA < currentFRS && balances.OA > 0) {
                         let needed = currentFRS - balances.SA;
                         let available = balances.OA;
@@ -628,13 +635,13 @@
                         }
                     }
 
-                    // 5. Interest
+                    // 5. Interest (Accumulate only inside loop)
                     annualInt.OA += (balances.OA * 0.025 / 12);
                     annualInt.SA += (balances.SA * 0.04 / 12);
                     annualInt.MA += (balances.MA * 0.04 / 12);
                     annualInt.RA += (balances.RA * 0.04 / 12);
 
-                    // 6. Overflow Logic
+                    // 6. Overflow Logic (Monthly)
                     if (balances.MA > currentBHS) {
                         let overflow = balances.MA - currentBHS;
                         balances.MA = currentBHS;
@@ -653,26 +660,55 @@
                             transfers.MA_OA += overflow;
                         }
                     }
-                } // End Month
+                } // End Month Loop
 
-                // Notes generation
-                if (totalContribThisYear >= (CPFConfig.ANNUAL_LIMIT - 10)) yearNotes.push({type: 'lim', text: 'Hit $37.7k Limit'});
-                
-                // Credit Interest
+                // --- YEAR END ACTIONS ---
+                // 1. Credit Interest
                 balances.OA += annualInt.OA;
                 balances.SA += annualInt.SA;
                 balances.MA += annualInt.MA;
                 balances.RA += annualInt.RA;
+
+                // 2. Handle Overflow from Interest Crediting
+                if (balances.MA > currentBHS) {
+                    let overflow = balances.MA - currentBHS;
+                    balances.MA = currentBHS;
+                    
+                    let target = saIsClosed ? 'RA' : 'SA';
+                    let limit = currentFRS; 
+                    let space = limit - balances[target];
+                    if (space > 0) {
+                        let move = Math.min(overflow, space);
+                        balances[target] += move;
+                        overflow -= move;
+                        if(saIsClosed) transfers.MA_RA += move; else transfers.MA_SA += move;
+                    }
+                    if (overflow > 0) {
+                        balances.OA += overflow;
+                        transfers.MA_OA += overflow;
+                    }
+                }
+
+                // Notes generation
+                if (totalContribThisYear >= (CPFConfig.ANNUAL_LIMIT - 10)) yearNotes.push({type: 'lim', text: 'Hit $37.7k Limit'});
                 
                 let totalInt = annualInt.OA + annualInt.SA + annualInt.MA + annualInt.RA;
                 yearNotes.push({type: 'int', text: `Int: ${fmtCompact(totalInt)}`});
 
-                // Deductions Notes (Aggregated for year for simplicity in notes)
+                // Deductions Notes (Show even if 0 deducted, to verify request)
+                if (housingDed > 0) yearNotes.push({type: 'ded', text: `Housing: ${fmtCompact(totalHousingDed)}`});
                 if (premiums.dps.amt > 0) yearNotes.push({type: 'ded', text: `DPS: $${premiums.dps.amt}`});
                 if (premiums.hps.amt > 0) yearNotes.push({type: 'ded', text: `HPS: $${premiums.hps.amt}`});
-                // Transfers
-                if(transfers.OA_SA > 0) yearNotes.push({type: 'tfr', text: `OA>SA: ${fmtCompact(transfers.OA_SA)}`});
+                if (premiums.medishield.amt > 0) yearNotes.push({type: 'ded', text: `MediS: $${premiums.medishield.amt}`});
+                if (premiums.eldershield.amt > 0) yearNotes.push({type: 'ded', text: `ElderS: $${premiums.eldershield.amt}`});
+                
+                // Voluntary Notes
+                if (monthlyCash > 0) yearNotes.push({type: 'tfr', text: `Vol. Cash: ${fmtCompact(totalVoluntaryCash)}`});
+                if (transfers.OA_SA > 0) yearNotes.push({type: 'tfr', text: `OA>SA (Vol): ${fmtCompact(transfers.OA_SA)}`});
+
+                // Overflow Transfers
                 if(transfers.MA_SA > 0) yearNotes.push({type: 'tfr', text: `MA>SA: ${fmtCompact(transfers.MA_SA)}`});
+                if(transfers.MA_RA > 0) yearNotes.push({type: 'tfr', text: `MA>RA: ${fmtCompact(transfers.MA_RA)}`});
                 if(transfers.MA_OA > 0) yearNotes.push({type: 'tfr', text: `MA>OA: ${fmtCompact(transfers.MA_OA)}`});
 
                 // --- AGE 55 EVENT ---
@@ -712,6 +748,10 @@
                     notes: yearNotes,
                     totalIn: totalContribThisYear
                 });
+
+                // Grow Limits (MOVED TO END)
+                currentBHS *= (1 + rates.bhsGrowth);
+                if (simAge <= 55) currentFRS *= (1 + rates.frsGrowth);
             }
 
             renderAll(results);
