@@ -46,6 +46,18 @@ A modern, responsive web-based CPF Simulator designed to forecast CPF balances b
 
 ---
 
+## 📊 Visual Guide: How It Works
+
+We have included a detailed visual breakdown of the fund flow logic, specifically focusing on the Age 55 SA Closure event and overflow rules.
+
+<a href="https://shamim-akhtar.github.io/cpf-sim/infographic.html">
+  <img src="https://img.shields.io/badge/View-Logic_Infographic-3b82f6?style=flat-square&logo=gitbook&logoColor=white" alt="View Infographic" />
+</a>
+
+*Click the badge above or open `https://shamim-akhtar.github.io/cpf-sim/infographic.html` to see the flow chart.*
+
+---
+
 ## 🌟 New Features (2026 Edition)
 
 * **SA Closure Logic:** Simulates the closure of the Special Account at age 55, transferring funds to the Retirement Account (RA) up to the FRS/ERS, with the remainder transferring to the Ordinary Account (OA).
