@@ -16,10 +16,6 @@ Found an issue? Have a suggestion? Feel free to open an issue or reach out!
   </a>
 </p>
 
-# CPF Simulator
-
-
-
 <!-- Simulator Link Button -->
 [![](https://github.com/shamim-akhtar/cpf-sim/blob/main/images/CPFSim_2026.jpg)](https://shamim-akhtar.github.io/cpf-sim/index.html)
 
