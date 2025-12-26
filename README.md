@@ -18,7 +18,11 @@ Found an issue? Have a suggestion? Feel free to open an issue or reach out!
 
 # CPF Simulator
 
+
+
 <!-- Simulator Link Button -->
+[![](https://github.com/shamim-akhtar/cpf-sim/blob/main/images/CPFSim_2026.jpg)](https://shamim-akhtar.github.io/cpf-sim/index.html)
+
 <p align="center">
   <a href="https://shamim-akhtar.github.io/cpf-sim/">
     <img src="https://img.shields.io/badge/🚀_Launch-CPF_Simulator_2026-059669?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Launch Simulator" height="40"/>
