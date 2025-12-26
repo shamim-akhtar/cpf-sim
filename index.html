@@ -1,492 +1,950 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CPF Simulator</title>
-  <!-- External CSS Libraries -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <!-- Custom CSS -->
-  <!-- <link rel="stylesheet" href="./styles.css"> -->
-    <style>
-        body {
-            margin-bottom: 0px; /* No extra space needed for footer */
-        }
-        footer {
-            bottom: 0;
-            width: 100%;
-            padding: 10px;
-            border-top: 1px solid #e7e7e7;
-            text-align: center;
-            background-color: #484848; /* Dark background color */
-        }
-        .footer-content {
-            /*max-width: 1200px;*/
-            margin: 0 auto;
-
-            padding: 10px;
-            border-radius: 5px;
-            color: white; /* White text for better contrast */
-        }
-    </style>
-
-</head>
-<body>
-      <!-- Header -->
-  <header class="bg-primary text-white text-center py-5 mb-4">
-    <h2>CPF Simulator - Calculate Your Projected CPF Balances</h2>
-  </header>
-  <!-- Educational Purpose Note -->
-
-  <div class="container-md" style="max-width: 1200px; margin: 0 auto;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPF Simulator (2026 Enhanced)</title>
     
-   
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Important Note</h5>
-                    <p>
-                    This CPF Simulator is created for <strong>educational purposes only</strong> and serves as a tool to help users approximate their projected CPF balances over time. 
-                    The calculations used in this simulator are based on <strong>publicly available information</strong> and general assumptions about CPF contributions, interest rates, and account limits. 
-                    </p>
-                    <p>
-                    While this simulator aims to provide useful estimates, it is not a substitute for official CPF statements or professional financial advice. 
-                    Always refer to your <a href="https://www.cpf.gov.sg/" target="_blank">official CPF account</a> or consult a financial advisor for accurate and personalized financial planning.
-                    </p>
-                    <hr>
-                    <p class="mb-0">
-                    <strong>Benefit to Users:</strong> This simulator helps you visualize your CPF growth over time, understand how different contributions and interest rates impact your balances, and make better-informed decisions about your retirement planning.
-                    </p>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .chart-container { position: relative; height: 200px; width: 100%; }
+        .main-chart-container { position: relative; height: 350px; width: 100%; }
+        
+        /* Table Styles */
+        .ledger-cell { padding: 0.5rem 0.5rem; white-space: nowrap; font-size: 0.7rem; border-right: 1px solid #f1f5f9; }
+        .ledger-header { background-color: #f8fafc; font-weight: 700; color: #475569; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; padding: 0.5rem; border-right: 1px solid #e2e8f0; }
+        
+        /* Note pill styles */
+        .note-pill { display: inline-block; padding: 1px 4px; border-radius: 3px; font-size: 0.65rem; margin-bottom: 2px; margin-right: 2px; border: 1px solid transparent;}
+        .note-int { background-color: #ecfccb; color: #365314; border-color: #d9f99d; } 
+        .note-tfr { background-color: #e0f2fe; color: #075985; border-color: #bae6fd; } 
+        .note-evt { background-color: #fef3c7; color: #92400e; border-color: #fde68a; } 
+        .note-lim { background-color: #fee2e2; color: #991b1b; border-color: #fecaca; } 
+        .note-ded { background-color: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; } /* Purple for deductions */
+        
+        /* Toggle Switch */
+        .toggle-checkbox:checked { right: 0; border-color: #68D391; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white text-blue-900 p-2 rounded-lg">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg md:text-xl tracking-tight block leading-tight">CPF Simulator</span>
+                        <span class="text-[10px] text-blue-300 uppercase tracking-widest">2026 Edition</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 text-[10px] md:text-xs text-blue-100">
+                    <span class="bg-blue-800 px-3 py-1 rounded-full border border-blue-700 hidden sm:inline-block">OW Cap: $8,000</span>
+                    <span class="bg-blue-800 px-3 py-1 rounded-full border border-blue-700">Limit: $37,740</span>
                 </div>
             </div>
         </div>
-    </div>
-    <br>
-    <form id="simulator-form" class="needs-validation" method="post" novalidate>
-      <div class="card">
-        <h6 class="card-header text-white bg-primary mb-3">Basic Inputs</h6>
-        <div class="card-body">
-          <p class="card-text">Key in the basic parameters needed for the simulation.</p>
-          <hr>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputName">Simulation Name</label>
-            <div class="col-sm-7">
-              <input type="text" class="form-control" id="inputName" value="Simulation 1" required>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputAge">Age</label>
-            <div class="col-sm-7">
-              <input type="number" class="form-control" id="inputAge" value="30" required min="18" max="65">
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputSalary">Salary (SGD)</label>
-            <div class="col-sm-7">
-              <input type="number" class="form-control" id="inputSalary" value="3000.00" required step="0.01" min="500" max="6000">
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputBonus">Bonus (months)</label>
-            <div class="col-sm-7">
-              <input type="number" class="form-control" id="inputBonus" value="1">
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputCash">Monthly Top-up</label>
-            <div class="col-sm-7">
-              <input type="number" class="form-control" id="inputCash" value="0.00" required step="0.01" min="0.00" max="5000.00">
-            </div>
-          </div>
-        </div>
-      </div>
-      <br>
-      <div class="card">
-        <div class="card-header text-white bg-success"><h6>Starting Account Balance</h6></div>
-        <div class="card-body">
-          <p class="card-text">Enter your CPF account balances. You can find this information from your CPF account.</p>
-          <hr>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputOA">Ordinary Account</label>
-            <div class="col-sm-7">
-              <input type="number" class="form-control" id="inputOA" value="0.00" required step="0.01" min="0.00" max="500000.00">
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputSA">Special Account</label>
-            <div class="col-sm-7">
-              <input type="number" class="form-control" id="inputSA" value="0.00" required step="0.01" min="0.00" max="500000.00">
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputMA">Medisave Account</label>
-            <div class="col-sm-7">
-              <input type="number" class="form-control" id="inputMA" value="0.00" required step="0.01" min="0.00" max="500000.00">
-            </div>
-          </div>
-        </div>
-      </div>
-      <br>
-      <div class="card">
-        <div class="card-header text-white bg-secondary mb-3"><h6>BHS &amp; FRS Rates of Increase</h6></div>
-        <div class="card-body">
-          <p class="card-text">Enter the expected growth rate of the Basic Healthcare Sum (BHS) and the Full Retirement Sum (FRS). A growth rate of 3-4% is a good choice.</p>
-          <hr>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right">FRS Rate</label>
-            <div class="col-sm-7">
-              <select class="custom-select" id="inputFRSRate">
-                <option value="0.0">0.0</option>
-                <option value="0.5">0.5</option>
-                <option value="1.0">1.0</option>
-                <option value="1.5">1.5</option>
-                <option value="2.0">2.0</option>
-                <option value="2.5">2.5</option>
-                <option value="3.0">3.0</option>
-                <option value="3.5">3.5</option>
-                <option value="4.0">4.0</option>
-                <option value="4.5">4.5</option>
-                <option value="5.0">5.0</option>
-                <option value="5.5">5.5</option>
-                <option value="6.0">6.0</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right">BHS Rate</label>
-            <div class="col-sm-7">
-              <select class="custom-select" id="inputBHSRate">
-                <option value="0.0">0.0</option>
-                <option value="0.5">0.5</option>
-                <option value="1.0">1.0</option>
-                <option value="1.5">1.5</option>
-                <option value="2.0">2.0</option>
-                <option value="2.5">2.5</option>
-                <option value="3.0">3.0</option>
-                <option value="3.5">3.5</option>
-                <option value="4.0">4.0</option>
-                <option value="4.5">4.5</option>
-                <option value="5.0">5.0</option>
-                <option value="5.5">5.5</option>
-                <option value="6.0">6.0</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-      <br>
-      <div class="card">
-        <div class="card-header text-white bg-warning mb-3"><h6>Deductions</h6></div>
-        <div class="card-body">
-          <p class="card-text">Enter the deductions from your CPF accounts. Typically this will be for housing, Medishield premium, ElderShield premium, Dependent Protection Scheme (DPS) premium and Home Protection Scheme (HPS) premium. By default, all these values are set to zero. You can change this and key in the exact amount, and the month it is deducted from your CPF.</p>
-          <hr>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right" for="inputHousing">Housing</label>
-            <div class="col-sm-7">
-              <input type="number" class="form-control" id="inputHousing" value="0.00" required step="0.01" min="0" max="1500">
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right">DPS</label>
-            <div class="col-sm-4">
-              <input type="number" class="form-control" id="inputDPS" value="0.00" required step="0.01" min="0.00" max="500.00">
-            </div>
-            <div class="col-sm-3">
-              <select class="custom-select" id="inputDPSM">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right">HPS</label>
-            <div class="col-sm-4">
-              <input type="number" class="form-control" id="inputHPS" value="0.00" required step="0.01" min="0.00" max="500.00">
-            </div>
-            <div class="col-sm-3">
-              <select class="custom-select" id="inputHPSM">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right">Medishield</label>
-            <div class="col-sm-4">
-              <input type="number" class="form-control" id="inputMedishield" value="0.00" required step="0.01" min="0" max="2500">
-            </div>
-            <div class="col-sm-3">
-              <select class="custom-select" id="inputMedishieldM">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-3 col-form-label text-right">Eldershield</label>
-            <div class="col-sm-4">
-              <input type="number" class="form-control" id="inputEldershield" value="0.00" required step="0.01" min="0" max="2500">
-            </div>
-            <div class="col-sm-3">
-              <select class="custom-select" id="inputEldershieldM">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-      <br>
-      <div class="card">
-        <div class="card-header text-white bg-info mb-3"><h6>Allow OA to SA Transfer</h6></div>
-        <div class="card-body">
-          <p class="card-text">
-            Finally, indicate whether or not you would allow the CPF simulator to automatically
-            transfer your ordinary account balance to your special account until your FRS is reached.
-            You can compare your CPF outputs based on allowed or not allowed settings. Try yourself
-            and see the various outputs of the simulator. By default, this value is set to false.
-          </p>
-          <hr>
-          <div class="form-group row">
-            <label class="col-sm-2">
-              <input type="radio" class="mr-1" name="allow_oa_to_sa" id="allow_oa_sa"> Yes
-            </label>
-            <label class="col-sm-2">
-              <input type="radio" class="mr-1" name="allow_oa_to_sa" checked>No
-            </label>
-          </div>
-          <div class="form-group">
-            <input type="button" class="btn btn-primary" value="Simulate" onclick="RunSimulation()">
-            <input type="button" class="btn btn-secondary" value="Reset All Simulations" onclick="ClearAll()">
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-  <br>
-  <div class="container-md" id="analysis_area"  style="max-width: 1200px; margin: 0 auto; display: none;">
-    <h5 class="card-header text-white bg-danger mb-3">Simulation Results</h5>
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Just before your 55th birthday!</h5>
-            <div class="chart-container">
-              <canvas id="doughnut_TOTAL_BALANCES_55"></canvas>
-            </div>
-            <p class="card-text" id="Print_TotalBalances55"></p>
-            <hr>
-            <p class="card-text" id="Print_TotalBalances55_Details"></p>
-            <div class="col text-center">
-              <a href="https://www.cpf.gov.sg/member/retirement-income/retirement-withdrawals/withdrawing-for-immediate-retirement-needs" class="btn btn-primary">Understand withdrawal options</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <br>
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Just before your 65th birthday!</h5>
-            <div class="chart-container">
-              <canvas id="doughnut_TOTAL_BALANCES_65"></canvas>
-            </div>
-            <p class="card-text" id="Print_TotalBalances65"></p>
-            <hr>
-            <p class="card-text" id="Print_TotalBalances65_Details"></p>
-            <div class="col text-center">
-              <a href="https://www.cpf.gov.sg/member/infohub/be-ready/meeting-my-retirement-needs?utm_source=gle&utm_medium=sem&utm_campaign=brd" class="btn btn-primary">Meeting retirement needs</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <br>
-    <input type="button" class="btn btn-primary" value="Click to go back & adjust your inputs" onclick="BackToForm()">
-    <br>
-    <br>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Account Balance Accumulation</h5>
-            <p class="card-text">
-              The below figure shows the total account balance for
-              your CPF using two line graphs per simulation run. The first line graph shows the total account balance,
-              which is the sum of the Ordinary, Special, Retirement and Medisave accounts.
-              The second line graph shows the sum of the Ordinary and Special accounts. After 55, this becomes the amount you can withdraw after
-              deducting the Full Retirement Sum.
-            </p>
-            <div style="height: 400px; width: 100%;">
-              <canvas id="chart_TOTAL_BALANCES"></canvas>
-            </div>
-            <h6 class="card-title" id="Print_TotalBalances"></h6>
-          </div>
-        </div>
-      </div>
-    </div>
-    <br>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Account Balances</h5>
-            <p class="card-text">
-              The below figure shows the total account balance for
-              your Ordinary, Special, Medisave and Retirement Accounts.
-            </p>
-            <div style="height: 400px; width: 100%;">
-              <canvas id="chart_TOTAL_ACCOUNTS"></canvas>
-            </div>
-            <h6 class="card-title" id="Print_TotalAccounts"></h6>
-          </div>
-        </div>
-      </div>
-    </div>
+    </nav>
 
-    <!--New addition for tables-->
-    
-  	<hr>
-  	<div class="row">
-    	<div class="col-sm-12">
-			<div class="container" id="Print_TotalBalances"></div>
-  		</div>
-  	</div>
-  	<hr>
-    
-    <h6 class="card-header text-white bg-primary mb-3">Individual Account with Age</h6>
-	<hr>
-  	<div class="row">
-    	<div class="col-sm-12">
-			<div class="container" id="Print_Accounts"></div>
-  		</div>
-  	</div>
-  	<hr>
-  	<div class="row">
-    	<div class="col-sm-12">
-			<div class="container" id="Print_Individual"></div>
-  		</div>
-  	</div>
-    <!--End table-->
-    <br>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Assumptions</h5>
-            <p class="card-text">
-                <ul>
-                  <li>Bonuses are credited at the start of each year, specifically in January.</li>
-                  <li>The additional 1% and extra additional 1% interest provided by the government are not included in the calculations.</li>
-                  <li>Interest is calculated monthly but only credited to the respective accounts at the end of the year.</li>
-                  <li><b>If age is below 55</b> and the SA has reached the Full Retirement Sum (FRS), the excess is redirected to the Ordinary Account (OA).</li>
-                  <li>
-                    When the Medisave Account (MA) balance exceeds the Basic Healthcare Sum (BHS) limit:
-                    <ul>
-                      <li><b>If age is below 55:</b> The excess contributions and interest from MA are transferred to the Special Account (SA). 
-                        <ul>
-                          <li>If the SA has not reached the Full Retirement Sum (FRS), the excess is fully transferred to SA.</li>
-                          <li>If the SA has reached the Full Retirement Sum (FRS), the excess is redirected to the Ordinary Account (OA).</li>
-                        </ul>
-                      </li>
-                      <li><b>If age is 55 or older:</b> The excess contributions and interest from MA are transferred to the Retirement Account (RA). 
-                        <ul>
-                          <li>If the RA has not reached the Full Retirement Sum (FRS), the excess is fully transferred to RA.</li>
-                          <li>If the RA has reached the Full Retirement Sum (FRS), the excess is redirected to the Ordinary Account (OA).</li>
-                        </ul>
-                      </li>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- LEFT COLUMN: Inputs (Sticky) -->
+            <div class="lg:col-span-4 space-y-5 sticky top-24">
+                <form id="simForm" onsubmit="event.preventDefault(); runSimulation();" class="space-y-5">
+                    
+                    <!-- Card: Personal -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center border-b pb-2 uppercase tracking-wide">
+                            <i class="fa-solid fa-user-circle text-blue-600 mr-2"></i> Profile & Income
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase">Age</label>
+                                    <input type="number" id="inputAge" value="30" min="18" max="64" class="w-full mt-1 p-2 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 text-sm bg-slate-50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase">Bonus (Months)</label>
+                                    <input type="number" id="inputBonus" value="1" step="0.1" class="w-full mt-1 p-2 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 text-sm bg-slate-50">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Monthly Gross Salary ($)</label>
+                                <input type="number" id="inputSalary" value="4000" class="w-full mt-1 p-2 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 text-sm bg-slate-50">
+                                <p class="text-[10px] text-slate-400 mt-1">Capped at $8,000 (2026 OW Ceiling)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Current Balances -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center border-b pb-2 uppercase tracking-wide">
+                            <i class="fa-solid fa-wallet text-blue-600 mr-2"></i> Current Balances
+                        </h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Ordinary (OA)</label>
+                                <input type="number" id="inputOA" value="25000" class="w-full mt-1 p-2 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 text-sm bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Special (SA)</label>
+                                <input type="number" id="inputSA" value="10000" class="w-full mt-1 p-2 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 text-sm bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Medisave (MA)</label>
+                                <input type="number" id="inputMA" value="12000" class="w-full mt-1 p-2 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 text-sm bg-slate-50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Projections -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center border-b pb-2 uppercase tracking-wide">
+                            <i class="fa-solid fa-sliders text-blue-600 mr-2"></i> Projections
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">FRS Growth</label>
+                                <select id="inputFRSRate" class="w-full mt-1 p-2 border border-slate-300 rounded text-sm bg-slate-50">
+                                    <option value="0.03">3.0%</option>
+                                    <option value="0.035" selected>3.5%</option>
+                                    <option value="0.04">4.0%</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">BHS Growth</label>
+                                <select id="inputBHSRate" class="w-full mt-1 p-2 border border-slate-300 rounded text-sm bg-slate-50">
+                                    <option value="0.03">3.0%</option>
+                                    <option value="0.04" selected>4.0%</option>
+                                    <option value="0.05">5.0%</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- ERS Option -->
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Target ERS at 55?</span>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                    <input type="checkbox" name="toggle" id="inputERS" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-slate-300"/>
+                                    <label for="inputERS" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1">If checked, transfers OA/SA to RA up to ERS (2x FRS) at 55.</p>
+                        </div>
+                    </div>
+
+                    <!-- Toggle Advanced -->
+                    <div class="flex items-center">
+                        <input id="showAdvanced" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" onchange="toggleAdvanced()">
+                        <label for="showAdvanced" class="ml-2 block text-sm text-gray-900 font-bold">Show Advanced (Contributions & Deductions)</label>
+                    </div>
+
+                    <!-- Card: Contributions & Deductions (Hidden by default) -->
+                    <div id="cardAdvanced" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 hidden">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center border-b pb-2 uppercase tracking-wide">
+                            <i class="fa-solid fa-file-invoice-dollar text-blue-600 mr-2"></i> Contributions & Deductions
+                        </h3>
+                        
+                        <!-- Voluntary Cash -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Monthly Voluntary Cash ($)</label>
+                            <input type="number" id="inputCash" value="0" class="w-full mt-1 p-2 border border-slate-300 rounded text-sm bg-slate-50">
+                            <p class="text-[10px] text-slate-400">Subject to Annual Limit ($37,740)</p>
+                        </div>
+
+                        <!-- Housing -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Housing Deduction (Monthly OA)</label>
+                            <input type="number" id="inputHousing" value="0" class="w-full mt-1 p-2 border border-slate-300 rounded text-sm bg-slate-50">
+                        </div>
+
+                        <!-- Insurance Premiums -->
+                        <div class="space-y-3 border-t border-slate-100 pt-3">
+                            <!-- Medishield -->
+                            <div class="grid grid-cols-3 gap-2 items-end">
+                                <div class="col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase">MediShield (MA)</label>
+                                    <input type="number" id="inputMedishield" placeholder="Amount" value="0" class="w-full mt-1 p-2 border border-slate-300 rounded text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase">Month</label>
+                                    <select id="inputMedishieldMonth" class="w-full mt-1 p-2 border border-slate-300 rounded text-xs bg-white">
+                                        <option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option>
+                                        <option value="3">Apr</option><option value="4">May</option><option value="5">Jun</option>
+                                        <option value="6">Jul</option><option value="7">Aug</option><option value="8">Sep</option>
+                                        <option value="9">Oct</option><option value="10">Nov</option><option value="11">Dec</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- ElderShield -->
+                            <div class="grid grid-cols-3 gap-2 items-end">
+                                <div class="col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase">ElderShield (MA)</label>
+                                    <input type="number" id="inputEldershield" placeholder="Amount" value="0" class="w-full mt-1 p-2 border border-slate-300 rounded text-xs">
+                                </div>
+                                <div>
+                                    <select id="inputEldershieldMonth" class="w-full mt-1 p-2 border border-slate-300 rounded text-xs bg-white">
+                                        <option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option>
+                                        <option value="3">Apr</option><option value="4">May</option><option value="5">Jun</option>
+                                        <option value="6">Jul</option><option value="7">Aug</option><option value="8">Sep</option>
+                                        <option value="9">Oct</option><option value="10">Nov</option><option value="11">Dec</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- DPS -->
+                            <div class="grid grid-cols-3 gap-2 items-end">
+                                <div class="col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase">DPS (OA)</label>
+                                    <input type="number" id="inputDPS" placeholder="Amount" value="0" class="w-full mt-1 p-2 border border-slate-300 rounded text-xs">
+                                </div>
+                                <div>
+                                    <select id="inputDPSMonth" class="w-full mt-1 p-2 border border-slate-300 rounded text-xs bg-white">
+                                        <option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option>
+                                        <option value="3">Apr</option><option value="4">May</option><option value="5">Jun</option>
+                                        <option value="6">Jul</option><option value="7">Aug</option><option value="8">Sep</option>
+                                        <option value="9">Oct</option><option value="10">Nov</option><option value="11">Dec</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- HPS -->
+                            <div class="grid grid-cols-3 gap-2 items-end">
+                                <div class="col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase">HPS (OA)</label>
+                                    <input type="number" id="inputHPS" placeholder="Amount" value="0" class="w-full mt-1 p-2 border border-slate-300 rounded text-xs">
+                                </div>
+                                <div>
+                                    <select id="inputHPSMonth" class="w-full mt-1 p-2 border border-slate-300 rounded text-xs bg-white">
+                                        <option value="0">Jan</option><option value="1">Feb</option><option value="2">Mar</option>
+                                        <option value="3">Apr</option><option value="4">May</option><option value="5">Jun</option>
+                                        <option value="6">Jul</option><option value="7">Aug</option><option value="8">Sep</option>
+                                        <option value="9">Oct</option><option value="10">Nov</option><option value="11">Dec</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Allow OA to SA Transfer (Moved here) -->
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Allow OA to SA Transfer?</span>
+                            </div>
+                            <div class="flex gap-4 text-sm">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="allowOASA" value="no" checked class="form-radio text-blue-600">
+                                    <span class="ml-2">No</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="allowOASA" value="yes" class="form-radio text-blue-600">
+                                    <span class="ml-2">Yes</span>
+                                </label>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1">Auto-transfer OA to SA until FRS is reached (Age < 55).</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-6 rounded-lg shadow-md text-white font-bold text-base bg-blue-600 hover:bg-blue-700 transition-all">
+                        Run Simulation
+                    </button>
+                    
+                </form>
+            </div>
+
+            <!-- RIGHT COLUMN: Results -->
+            <div class="lg:col-span-8 space-y-6 relative">
+                
+                <!-- Initial State Overlay -->
+                <div id="loadingOverlay" class="absolute inset-0 bg-slate-50/95 z-20 flex items-start justify-center pt-20 backdrop-blur-sm">
+                    <div class="text-center p-8">
+                        <div class="inline-block p-4 rounded-full bg-blue-100 mb-4 animate-pulse">
+                            <i class="fa-solid fa-calculator text-3xl text-blue-500"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-700">Ready to Forecast</h2>
+                        <p class="text-slate-500 mt-2">Adjust values on the left and click Run Simulation.</p>
+                        <div class="mt-4 text-xs text-slate-400">Defaults: BHS $79k | FRS $220.4k | OW $8k</div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-md shadow-sm">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-lg"></i>
+                        </div>
+                        <div class="ml-4 text-xs text-amber-800 leading-relaxed space-y-2">
+                            <p class="font-bold">Disclaimer:</p>
+                            <p>I am not a financial advisor. Neither am I trying to sell you anything. This CPF simulator is for educational purposes. The calculations used in this simulator are derived from publicly available information. It projects the CPF account amounts based on the inputs you provide. No data is retained for the working of the simulator. The entire calculation takes place on the browser, and no information is sent to the server. If you find any problems or flaws, please send me a note via comments or email.</p>
+                            <p class="border-t border-amber-200 pt-2">
+                                <strong>2026 Rules:</strong> Monthly OW Ceiling is $8,000. Total Annual Wage Ceiling is $102,000. Contribution Limit is strictly capped at $37,740 (Mandatory + Voluntary). SA closes at 55.
+                            <strong>Rates:</strong> Base interest (2.5% OA, 4.0% Others). Extra interest tiers excluded for conservatism.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Snapshot Cards (55 & 65) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Age 55 Card -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="bg-indigo-50 px-5 py-3 border-b border-indigo-100 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-indigo-900 text-base">Age 55</h4>
+                                <p class="text-[10px] text-indigo-600 uppercase tracking-wider">Retirement Sum Creation</p>
+                            </div>
+                            <div class="h-8 w-8 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-700 font-bold text-sm">55</div>
+                        </div>
+                        <div class="p-5 flex-grow flex flex-col justify-between">
+                             <div class="chart-container flex justify-center">
+                                <canvas id="chart55"></canvas>
+                             </div>
+                             <div class="mt-2 text-center">
+                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Balance</p>
+                                 <p class="text-2xl font-extrabold text-indigo-600 my-0" id="valTotal55">$0</p>
+                             </div>
+                             <div class="mt-3 grid grid-cols-3 gap-1 text-center text-xs border-t pt-2">
+                                <div><p class="text-slate-400 text-[10px]">OA</p><p class="font-bold text-slate-700" id="valOA55">-</p></div>
+                                <div><p class="text-slate-400 text-[10px]">RA</p><p class="font-bold text-slate-700" id="valRA55">-</p></div>
+                                <div><p class="text-slate-400 text-[10px]">MA</p><p class="font-bold text-slate-700" id="valMA55">-</p></div>
+                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Age 65 Card -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="bg-emerald-50 px-5 py-3 border-b border-emerald-100 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-emerald-900 text-base">Age 65</h4>
+                                <p class="text-[10px] text-emerald-600 uppercase tracking-wider">Payout Eligibility</p>
+                            </div>
+                            <div class="h-8 w-8 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-bold text-sm">65</div>
+                        </div>
+                        <div class="p-5 flex-grow flex flex-col justify-between">
+                            <div class="chart-container flex justify-center">
+                                <canvas id="chart65"></canvas>
+                             </div>
+                             <div class="mt-2 text-center">
+                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Balance</p>
+                                 <p class="text-2xl font-extrabold text-emerald-600 my-0" id="valTotal65">$0</p>
+                             </div>
+                             <div class="mt-3 grid grid-cols-3 gap-1 text-center text-xs border-t pt-2">
+                                <div><p class="text-slate-400 text-[10px]">OA</p><p class="font-bold text-slate-700" id="valOA65">-</p></div>
+                                <div><p class="text-slate-400 text-[10px]">RA</p><p class="font-bold text-slate-700" id="valRA65">-</p></div>
+                                <div><p class="text-slate-400 text-[10px]">MA</p><p class="font-bold text-slate-700" id="valMA65">-</p></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Chart -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-bold text-slate-800">Growth Projection</h3>
+                        <div class="flex gap-3">
+                            <span class="flex items-center text-[10px]"><span class="w-2 h-2 rounded-full bg-blue-500 mr-1"></span>OA</span>
+                            <span class="flex items-center text-[10px]"><span class="w-2 h-2 rounded-full bg-amber-500 mr-1"></span>RA</span>
+                            <span class="flex items-center text-[10px]"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1"></span>MA</span>
+                        </div>
+                    </div>
+                    <div class="main-chart-container">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Financial Analysis Card -->
+                <div class="bg-slate-800 text-white p-5 rounded-xl shadow-md border border-slate-700">
+                    <h3 class="text-sm font-bold mb-3 border-b border-slate-600 pb-2 flex items-center">
+                        <i class="fa-solid fa-magnifying-glass-chart mr-2 text-emerald-400"></i> Financial Summary
+                    </h3>
+                    <div id="analysisTextContainer" class="space-y-3 text-sm leading-relaxed text-slate-300">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                 <!-- Assumptions Section -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-800 mb-2 border-b pb-2">Assumptions & Logic</h3>
+                    <ul class="list-disc list-inside space-y-1 text-xs text-slate-600">
+                        <li><strong>Annual Wage Ceiling ($102k):</strong> OW capped at $8,000/mo. Bonus capped at ($102,000 - Annual OW).</li>
+                        <li><strong>Contribution Limit ($37,740):</strong> Mandatory contributions take priority. Voluntary cash is filled only up to this limit.</li>
+                        <li><strong>BHS:</strong> Starts at $79,000. <strong>FRS:</strong> Starts at $220,400.</li>
+                        <li><strong>Overflow:</strong> MA > BHS overflows to SA (Pre-55) or RA (Post-55). If full, overflows to OA.</li>
+                        <li><strong>Deductions:</strong> DPS/HPS from OA. Medishield/ElderShield from MA.</li>
                     </ul>
-                  </li>
-                </ul>
-              </p>
-              
-              
-          </div>
+                </div>
+
+                <!-- Detailed Ledger Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="px-5 py-3 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">Detailed Transaction Ledger</h3>
+                            <p class="text-[10px] text-slate-500">Includes Interest & Transfers</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto max-h-[600px]">
+                        <table class="min-w-full divide-y divide-slate-200 border-collapse">
+                            <thead class="bg-slate-100 sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="ledger-header w-10 text-center">Age</th>
+                                    <th class="ledger-header w-16 text-center text-slate-600 bg-slate-200">Total<br>Contrib</th>
+                                    <!-- Group OA -->
+                                    <th class="ledger-header text-center bg-blue-50 text-blue-800" colspan="2">Ordinary (OA)</th>
+                                    <!-- Group SA -->
+                                    <th class="ledger-header text-center bg-purple-50 text-purple-800" colspan="2">Special (SA)</th>
+                                    <!-- Group MA -->
+                                    <th class="ledger-header text-center bg-emerald-50 text-emerald-800" colspan="2">Medisave (MA)</th>
+                                    <!-- Group RA -->
+                                    <th class="ledger-header text-center bg-amber-50 text-amber-800" colspan="2">Retirement (RA)</th>
+                                    
+                                    <th class="ledger-header text-left min-w-[180px]">Notes</th>
+                                </tr>
+                                <tr class="bg-slate-50 text-xs">
+                                    <th class="p-1 border-r border-slate-200"></th>
+                                    <th class="p-1 border-r border-slate-200 bg-slate-100"></th>
+                                    
+                                    <th class="p-1 text-right text-slate-500 border-r border-slate-200 bg-blue-50/50 text-[10px]">In</th>
+                                    <th class="p-1 text-right text-slate-500 border-r border-slate-200 bg-blue-50/50 text-[10px]">Bal</th>
+                                    
+                                    <th class="p-1 text-right text-slate-500 border-r border-slate-200 bg-purple-50/50 text-[10px]">In</th>
+                                    <th class="p-1 text-right text-slate-500 border-r border-slate-200 bg-purple-50/50 text-[10px]">Bal</th>
+                                    
+                                    <th class="p-1 text-right text-slate-500 border-r border-slate-200 bg-emerald-50/50 text-[10px]">In</th>
+                                    <th class="p-1 text-right text-slate-500 border-r border-slate-200 bg-emerald-50/50 text-[10px]">Bal</th>
+                                    
+                                    <th class="p-1 text-right text-slate-500 border-r border-slate-200 bg-amber-50/50 text-[10px]">In</th>
+                                    <th class="p-1 text-right text-slate-500 border-r border-slate-200 bg-amber-50/50 text-[10px]">Bal</th>
+                                    
+                                    <th class="p-1"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledgerBody" class="bg-white divide-y divide-slate-100 text-xs">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
-      </div>
     </div>
-    <br>
 
-    <!-- <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Disclaimer</h5>
-            <p class="card-text font-italic">
-              I am not a financial advisor. Neither am I trying to sell you anything.
-              This CPF simulator is for educational purposes. The calculations used in this simulator
-              are derived from publicly available information. It projects the CPF account amounts
-              based on the inputs you provide. No data is retained for the working of the simulator.
-              The entire calculation takes place on the browser, and no information is sent to the server.
-              If you find any problems or flaws, please send me a note via comments or email.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div> -->
-    
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let chart55 = null;
+        let chart65 = null;
+        let mainChart = null;
 
-  </div>
-<!-- Footer with Disclaimer -->
+        // --- CONFIGURATION ---
+        const CPFConfig = {
+            OW_CEILING: 8000.0,    // 2026 OW Cap
+            WAGE_CEILING: 102000.0,
+            ANNUAL_LIMIT: 37740.0, 
+            START_BHS: 79000.0,    
+            START_FRS: 220400.0,   
+            
+            getAllocation: function(age) {
+                if (age <= 35) return [0.23, 0.06, 0.08];    
+                if (age <= 45) return [0.21, 0.07, 0.09];    
+                if (age <= 50) return [0.19, 0.08, 0.10];    
+                if (age <= 55) return [0.15, 0.115, 0.105];  
+                if (age <= 60) return [0.12, 0.10, 0.105];   
+                if (age <= 65) return [0.035, 0.095, 0.105]; 
+                return [0.01, 0.05, 0.105]; 
+            }
+        };
 
-<footer>
-    <div class="footer-content">
-      <p>
-        <strong>Disclaimer:</strong> This CPF simulator is intended for educational purposes only. It is not financial advice and should not be considered as such. 
-        The calculations are based on publicly available information and the assumptions made by the developer. Results may differ from actual CPF account balances. 
-        No data is stored or transmitted; all calculations occur locally in your browser. If you find errors or have suggestions, feel free to reach out via comments or email.
-      </p>
-    </div>
-  </footer>
+        const fmtMoney = (val) => {
+            if (val === undefined || val === null || isNaN(val)) return '$0';
+            return new Intl.NumberFormat('en-SG', { style: 'currency', currency: 'SGD', maximumFractionDigits: 0 }).format(val);
+        };
+        const fmtMoneyFull = (val) => {
+             return new Intl.NumberFormat('en-SG', { style: 'currency', currency: 'SGD', minimumFractionDigits: 2 }).format(val);
+        };
+        const fmtCompact = (val) => {
+             return '$' + (val/1000).toFixed(1) + 'k';
+        }
 
+        function toggleAdvanced() {
+            const card = document.getElementById('cardAdvanced');
+            card.classList.toggle('hidden');
+        }
 
-  <!-- External JavaScript Libraries -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
-  <!-- Custom JavaScript -->
-  <!-- <script src="config.js"></script> -->
-  <script src="script.js"></script>
+        // --- MAIN SIMULATION ---
+        function runSimulation() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+
+            // Inputs
+            const startAge = parseInt(document.getElementById('inputAge').value) || 30;
+            const salary = parseFloat(document.getElementById('inputSalary').value) || 0;
+            const bonusMonths = parseFloat(document.getElementById('inputBonus').value) || 0;
+            
+            // Deductions & Options
+            const monthlyCash = parseFloat(document.getElementById('inputCash').value) || 0;
+            const housingDed = parseFloat(document.getElementById('inputHousing').value) || 0;
+            
+            const premiums = {
+                medishield: { amt: parseFloat(document.getElementById('inputMedishield').value)||0, month: parseInt(document.getElementById('inputMedishieldMonth').value) },
+                eldershield: { amt: parseFloat(document.getElementById('inputEldershield').value)||0, month: parseInt(document.getElementById('inputEldershieldMonth').value) },
+                dps: { amt: parseFloat(document.getElementById('inputDPS').value)||0, month: parseInt(document.getElementById('inputDPSMonth').value) },
+                hps: { amt: parseFloat(document.getElementById('inputHPS').value)||0, month: parseInt(document.getElementById('inputHPSMonth').value) }
+            };
+
+            const useERS = document.getElementById('inputERS').checked;
+            const allowOAToSA = document.querySelector('input[name="allowOASA"]:checked').value === 'yes';
+
+            const rates = {
+                frsGrowth: parseFloat(document.getElementById('inputFRSRate').value),
+                bhsGrowth: parseFloat(document.getElementById('inputBHSRate').value),
+            };
+
+            // Init Balances
+            let balances = {
+                OA: parseFloat(document.getElementById('inputOA').value) || 0,
+                SA: parseFloat(document.getElementById('inputSA').value) || 0,
+                MA: parseFloat(document.getElementById('inputMA').value) || 0,
+                RA: 0
+            };
+
+            let currentBHS = CPFConfig.START_BHS;
+            let currentFRS = CPFConfig.START_FRS;
+            let saIsClosed = false;
+
+            const results = [];
+            const endAge = 65; 
+            const yearsToSimulate = endAge - startAge;
+
+            for (let i = 1; i <= yearsToSimulate; i++) {
+                let simAge = startAge + i;
+                
+                // Calculations
+                let monthlyOW = Math.min(salary, CPFConfig.OW_CEILING);
+                let annualOW = monthlyOW * 12;
+                let awCeiling = Math.max(0, CPFConfig.WAGE_CEILING - annualOW);
+                let totalBonus = salary * bonusMonths;
+                let bonusPayable = Math.min(totalBonus, awCeiling); 
+
+                // Trackers
+                let annualContrib = { OA: 0, SA: 0, MA: 0, RA: 0 };
+                let annualInt = { OA: 0, SA: 0, MA: 0, RA: 0 };
+                let yearNotes = [];
+                let totalContribThisYear = 0; 
+                let transfers = { MA_SA: 0, MA_OA: 0, MA_RA: 0, OA_SA: 0 };
+                let totalHousingDed = 0; 
+                let totalVoluntaryCash = 0; 
+
+                // --- MONTHLY CYCLE ---
+                for (let m = 0; m < 12; m++) {
+                    
+                    let alloc = CPFConfig.getAllocation(simAge);
+                    let wagesThisMonth = monthlyOW;
+                    if (m === 0) wagesThisMonth += bonusPayable;
+
+                    // 1. Mandatory Contributions
+                    let potOA = wagesThisMonth * alloc[0];
+                    let potSA = wagesThisMonth * alloc[1];
+                    let potMA = wagesThisMonth * alloc[2];
+                    let potTotal = potOA + potSA + potMA;
+
+                    let headroom = Math.max(0, CPFConfig.ANNUAL_LIMIT - totalContribThisYear);
+                    let actualTotal = Math.min(potTotal, headroom);
+
+                    if (actualTotal > 0) {
+                        let ratio = actualTotal / potTotal;
+                        addContrib(balances, annualContrib, potOA * ratio, potSA * ratio, potMA * ratio, saIsClosed);
+                        totalContribThisYear += actualTotal;
+                    }
+
+                    // 2. Voluntary Cash (Enforce Annual Limit Check Before Adding)
+                    if (totalContribThisYear < CPFConfig.ANNUAL_LIMIT && monthlyCash > 0) {
+                        headroom = CPFConfig.ANNUAL_LIMIT - totalContribThisYear;
+                        let actualCash = Math.min(monthlyCash, headroom);
+                        
+                        if (actualCash > 0) {
+                            if (simAge < 55) {
+                                if(balances.SA < currentFRS) {
+                                    balances.SA += actualCash; annualContrib.SA += actualCash;
+                                }
+                            } else {
+                                if(balances.RA < currentFRS) {
+                                    balances.RA += actualCash; annualContrib.RA += actualCash;
+                                }
+                            }
+                            totalContribThisYear += actualCash;
+                            totalVoluntaryCash += actualCash;
+                        }
+                    }
+
+                    // 3. Deductions (Prioritized: Deduct from balance directly)
+                    // Housing (OA)
+                    if (housingDed > 0) {
+                        // Deduct max possible up to the amount needed
+                        let dedAmt = Math.min(balances.OA, housingDed);
+                        balances.OA -= dedAmt;
+                        totalHousingDed += dedAmt;
+                    }
+                    
+                    // Premiums
+                    if (m === premiums.medishield.month && premiums.medishield.amt > 0) {
+                        let dedAmt = Math.min(balances.MA, premiums.medishield.amt);
+                        balances.MA -= dedAmt;
+                    }
+                    if (m === premiums.eldershield.month && premiums.eldershield.amt > 0) {
+                        let dedAmt = Math.min(balances.MA, premiums.eldershield.amt);
+                        balances.MA -= dedAmt;
+                    }
+                    if (m === premiums.dps.month && premiums.dps.amt > 0) {
+                        let dedAmt = Math.min(balances.OA, premiums.dps.amt);
+                        balances.OA -= dedAmt;
+                    }
+                    if (m === premiums.hps.month && premiums.hps.amt > 0) {
+                        let dedAmt = Math.min(balances.OA, premiums.hps.amt);
+                        balances.OA -= dedAmt;
+                    }
+
+                    // 4. OA to SA Transfer Logic (Auto)
+                    // Rule: Only if Age < 55, Enabled, SA < FRS, and OA balance > 0 (after deductions)
+                    if (allowOAToSA && !saIsClosed && balances.SA < currentFRS && balances.OA > 0) {
+                        let needed = currentFRS - balances.SA;
+                        let available = balances.OA;
+                        let transferAmt = Math.min(available, needed);
+                        if (transferAmt > 0) {
+                            balances.OA -= transferAmt;
+                            balances.SA += transferAmt;
+                            transfers.OA_SA += transferAmt;
+                        }
+                    }
+
+                    // 5. Interest (Accumulate only inside loop)
+                    annualInt.OA += (balances.OA * 0.025 / 12);
+                    annualInt.SA += (balances.SA * 0.04 / 12);
+                    annualInt.MA += (balances.MA * 0.04 / 12);
+                    annualInt.RA += (balances.RA * 0.04 / 12);
+
+                    // 6. Overflow Logic (Monthly)
+                    if (balances.MA > currentBHS) {
+                        let overflow = balances.MA - currentBHS;
+                        balances.MA = currentBHS;
+                        
+                        let target = saIsClosed ? 'RA' : 'SA';
+                        let limit = currentFRS; 
+                        let space = limit - balances[target];
+                        if (space > 0) {
+                            let move = Math.min(overflow, space);
+                            balances[target] += move;
+                            overflow -= move;
+                            if(saIsClosed) transfers.MA_RA += move; else transfers.MA_SA += move;
+                        }
+                        if (overflow > 0) {
+                            balances.OA += overflow;
+                            transfers.MA_OA += overflow;
+                        }
+                    }
+                } // End Month Loop
+
+                // --- YEAR END ACTIONS ---
+                // 1. Credit Interest
+                balances.OA += annualInt.OA;
+                balances.SA += annualInt.SA;
+                balances.MA += annualInt.MA;
+                balances.RA += annualInt.RA;
+
+                // 2. Handle Overflow from Interest Crediting
+                if (balances.MA > currentBHS) {
+                    let overflow = balances.MA - currentBHS;
+                    balances.MA = currentBHS;
+                    
+                    let target = saIsClosed ? 'RA' : 'SA';
+                    let limit = currentFRS; 
+                    let space = limit - balances[target];
+                    if (space > 0) {
+                        let move = Math.min(overflow, space);
+                        balances[target] += move;
+                        overflow -= move;
+                        if(saIsClosed) transfers.MA_RA += move; else transfers.MA_SA += move;
+                    }
+                    if (overflow > 0) {
+                        balances.OA += overflow;
+                        transfers.MA_OA += overflow;
+                    }
+                }
+
+                // Notes generation
+                if (totalContribThisYear >= (CPFConfig.ANNUAL_LIMIT - 10)) yearNotes.push({type: 'lim', text: 'Hit $37.7k Limit'});
+                
+                let totalInt = annualInt.OA + annualInt.SA + annualInt.MA + annualInt.RA;
+                yearNotes.push({type: 'int', text: `Int: ${fmtCompact(totalInt)}`});
+
+                // Deductions Notes (Show even if 0 deducted, to verify request)
+                if (housingDed > 0) yearNotes.push({type: 'ded', text: `Housing: ${fmtCompact(totalHousingDed)}`});
+                if (premiums.dps.amt > 0) yearNotes.push({type: 'ded', text: `DPS: $${premiums.dps.amt}`});
+                if (premiums.hps.amt > 0) yearNotes.push({type: 'ded', text: `HPS: $${premiums.hps.amt}`});
+                if (premiums.medishield.amt > 0) yearNotes.push({type: 'ded', text: `MediS: $${premiums.medishield.amt}`});
+                if (premiums.eldershield.amt > 0) yearNotes.push({type: 'ded', text: `ElderS: $${premiums.eldershield.amt}`});
+                
+                // Voluntary Notes
+                if (monthlyCash > 0) yearNotes.push({type: 'tfr', text: `Vol. Cash: ${fmtCompact(totalVoluntaryCash)}`});
+                if (transfers.OA_SA > 0) yearNotes.push({type: 'tfr', text: `OA>SA (Vol): ${fmtCompact(transfers.OA_SA)}`});
+
+                // Overflow Transfers
+                if(transfers.MA_SA > 0) yearNotes.push({type: 'tfr', text: `MA>SA: ${fmtCompact(transfers.MA_SA)}`});
+                if(transfers.MA_RA > 0) yearNotes.push({type: 'tfr', text: `MA>RA: ${fmtCompact(transfers.MA_RA)}`});
+                if(transfers.MA_OA > 0) yearNotes.push({type: 'tfr', text: `MA>OA: ${fmtCompact(transfers.MA_OA)}`});
+
+                // --- AGE 55 EVENT ---
+                if (simAge === 55) {
+                    let targetLimit = useERS ? (currentFRS * 2) : currentFRS;
+                    let targetLabel = useERS ? "ERS" : "FRS";
+                    yearNotes.push({type: 'evt', text: `RA Created (Target ${targetLabel}: ${fmtCompact(targetLimit)})`});
+                    
+                    let req = targetLimit - balances.RA;
+                    let fromSA = Math.min(balances.SA, req);
+                    if (fromSA > 0) {
+                        balances.RA += fromSA; balances.SA -= fromSA;
+                        yearNotes.push({type: 'tfr', text: `SA>RA: ${fmtCompact(fromSA)}`});
+                    }
+
+                    req = targetLimit - balances.RA;
+                    if (req > 0) {
+                        let fromOA = Math.min(balances.OA, req);
+                        balances.RA += fromOA; balances.OA -= fromOA;
+                        yearNotes.push({type: 'tfr', text: `OA>RA: ${fmtCompact(fromOA)}`});
+                    }
+
+                    if (balances.SA > 0) {
+                        yearNotes.push({type: 'tfr', text: `SA>OA: ${fmtCompact(balances.SA)} (Closure)`});
+                        balances.OA += balances.SA; balances.SA = 0;
+                    }
+                    saIsClosed = true;
+                }
+
+                results.push({ 
+                    age: simAge, 
+                    OA: balances.OA, SA: balances.SA, MA: balances.MA, RA: balances.RA,
+                    total: balances.OA + balances.SA + balances.MA + balances.RA,
+                    FRS: currentFRS,
+                    contrib: annualContrib,
+                    interest: annualInt,
+                    notes: yearNotes,
+                    totalIn: totalContribThisYear
+                });
+
+                // Grow Limits (MOVED TO END)
+                currentBHS *= (1 + rates.bhsGrowth);
+                if (simAge <= 55) currentFRS *= (1 + rates.frsGrowth);
+            }
+
+            renderAll(results);
+        }
+
+        function addContrib(bal, log, oa, sa, ma, closed) {
+            bal.OA += oa; log.OA += oa;
+            bal.MA += ma; log.MA += ma;
+            if(!closed) { bal.SA += sa; log.SA += sa; }
+            else { bal.RA += sa; log.RA += sa; }
+        }
+
+        // --- RENDERING ---
+        function renderAll(data) {
+            renderSnapshots(data);
+            renderMainChart(data);
+            renderAnalysisText(data);
+            renderLedger(data);
+        }
+
+        function renderSnapshots(data) {
+            const d55 = data.find(d => d.age === 55);
+            const d65 = data.find(d => d.age === 65) || data[data.length - 1];
+
+            if (d55) {
+                document.getElementById('valTotal55').innerText = fmtMoney(d55.total);
+                document.getElementById('valOA55').innerText = fmtMoney(d55.OA);
+                document.getElementById('valRA55').innerText = fmtMoney(d55.RA);
+                document.getElementById('valMA55').innerText = fmtMoney(d55.MA);
+                renderPie('chart55', d55, 'chart55');
+            }
+
+            if (d65) {
+                document.getElementById('valTotal65').innerText = fmtMoney(d65.total);
+                document.getElementById('valOA65').innerText = fmtMoney(d65.OA);
+                document.getElementById('valRA65').innerText = fmtMoney(d65.RA);
+                document.getElementById('valMA65').innerText = fmtMoney(d65.MA);
+                renderPie('chart65', d65, 'chart65');
+            }
+        }
+
+        function renderAnalysisText(data) {
+            const d55 = data.find(d => d.age === 55);
+            const d65 = data.find(d => d.age === 65) || data[data.length - 1];
+            const container = document.getElementById('analysisTextContainer');
+
+            if (!d55) {
+                container.innerHTML = "<p>Data for Age 55 not available.</p>";
+                return;
+            }
+
+            let useERS = document.getElementById('inputERS').checked;
+            let targetType = useERS ? "Enhanced Retirement Sum (ERS)" : "Full Retirement Sum (FRS)";
+            let frsTarget = useERS ? (d55.FRS * 2) : d55.FRS;
+            let shortfall = frsTarget - d55.RA;
+            let hitTarget = shortfall <= 100; 
+
+            // Estimate based on RA at 55
+            let estimatedPayout = d55.RA * 0.0077;
+            let payoutLower = Math.floor(estimatedPayout / 50) * 50;
+            let payoutUpper = payoutLower + 100;
+
+            let text55 = `
+                <div class="mb-4 p-3 bg-slate-700 rounded-lg">
+                    <p class="mb-2 text-indigo-300 font-bold text-sm border-b border-slate-600 pb-1">At Age 55 (SA Closure Event)</p>
+                    <p class="mb-2">
+                        Your Special Account (SA) has been <strong>closed</strong>. 
+                        Funds were transferred to your Retirement Account (RA) aiming for the <span class="text-white font-bold">${targetType}</span> target of <span class="text-amber-300 font-bold">${fmtMoney(frsTarget)}</span>.
+                    </p>
+                    <p class="mb-2">
+                         ${hitTarget 
+                            ? `<span class="text-emerald-400 font-bold"><i class="fa-solid fa-check"></i> Target Met.</span> Your RA is fully funded.` 
+                            : `<span class="text-orange-400 font-bold"><i class="fa-solid fa-circle-exclamation"></i> Target Not Fully Met.</span> Your RA contains ${fmtMoney(d55.RA)}, which is short by ${fmtMoney(shortfall)}.`}
+                    </p>
+                    <p>
+                        Your Ordinary Account (OA) balance stands at <span class="text-blue-300 font-bold">${fmtMoney(d55.OA)}</span>.
+                    </p>
+                </div>
+            `;
+
+            let text65 = `
+                <div class="p-3 bg-slate-700 rounded-lg">
+                    <p class="mb-2 text-emerald-300 font-bold text-sm border-b border-slate-600 pb-1">At Age 65 (Payout Estimation)</p>
+                    <p class="mb-2">
+                        Your RA has grown to <span class="text-amber-300 font-bold">${fmtMoney(d65.RA)}</span>.
+                    </p>
+                    <div class="bg-slate-800 p-2 rounded border border-slate-600 mb-2">
+                        <p class="text-xs text-slate-400 uppercase tracking-widest mb-1">Approx. CPF LIFE Monthly Payout</p>
+                        <p class="text-xl font-bold text-white">${fmtMoney(payoutLower)} - ${fmtMoney(payoutUpper)}</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Based on RA accumulated at age 55 (${fmtMoney(d55.RA)}).</p>
+                    </div>
+                    <p class="text-[10px] text-orange-200 italic">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> <strong>Important:</strong> This is a rough approximation based on current Standard Plan factors. 
+                        Actual payouts depend on gender, prevailing interest rates, and life expectancy at the time of payout. 
+                        Always refer to the official CPF Payout Estimator for accurate figures.
+                    </p>
+                </div>
+            `;
+
+            container.innerHTML = text55 + text65;
+        }
+
+        function renderLedger(data) {
+            const tbody = document.getElementById('ledgerBody');
+            tbody.innerHTML = '';
+
+            for(let i=0; i<data.length; i++) {
+                let r = data[i];
+                let row = document.createElement('tr');
+                row.className = r.age === 55 ? 'bg-indigo-50/50' : (i%2===0 ? 'bg-white' : 'bg-slate-50/50');
+
+                let noteHtml = r.notes.map(n => `<span class="note-pill note-${n.type}">${n.text}</span>`).join('');
+                let totalContrib = Math.round(r.totalIn);
+                let hitLimit = totalContrib >= (CPFConfig.ANNUAL_LIMIT - 5); 
+                let totalClass = hitLimit ? "text-red-500 font-bold" : "text-slate-600";
+
+                row.innerHTML = `
+                    <td class="ledger-cell font-bold text-slate-700 text-center">${r.age}</td>
+                    <td class="ledger-cell text-center ${totalClass} bg-slate-100/50">${fmtCompact(totalContrib)}</td>
+                    
+                    <td class="ledger-cell text-right text-blue-600 bg-blue-50/20">${Math.round(r.contrib.OA)>0 ? fmtCompact(r.contrib.OA) : '-'}</td>
+                    <td class="ledger-cell text-right text-slate-500 bg-blue-50/20">${fmtCompact(r.OA)}</td>
+                    
+                    <td class="ledger-cell text-right text-purple-600 bg-purple-50/20">${Math.round(r.contrib.SA)>0 ? fmtCompact(r.contrib.SA) : '-'}</td>
+                    <td class="ledger-cell text-right text-slate-500 bg-purple-50/20">${fmtCompact(r.SA)}</td>
+                    
+                    <td class="ledger-cell text-right text-emerald-600 bg-emerald-50/20">${Math.round(r.contrib.MA)>0 ? fmtCompact(r.contrib.MA) : '-'}</td>
+                    <td class="ledger-cell text-right text-slate-500 bg-emerald-50/20">${fmtCompact(r.MA)}</td>
+                    
+                    <td class="ledger-cell text-right text-amber-600 bg-amber-50/20">${Math.round(r.contrib.RA)>0 ? fmtCompact(r.contrib.RA) : '-'}</td>
+                    <td class="ledger-cell text-right text-slate-500 bg-amber-50/20">${fmtCompact(r.RA)}</td>
+                    
+                    <td class="ledger-cell text-left whitespace-normal leading-tight w-48">${noteHtml}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderPie(canvasId, data, chartVarName) {
+            const ctx = document.getElementById(canvasId);
+            if (chartVarName === 'chart55' && chart55) chart55.destroy();
+            if (chartVarName === 'chart65' && chart65) chart65.destroy();
+
+            const config = {
+                type: 'doughnut',
+                data: {
+                    labels: ['OA', 'SA', 'MA', 'RA'],
+                    datasets: [{
+                        data: [data.OA, data.SA, data.MA, data.RA],
+                        backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { display: false } }
+                }
+            };
+            const newChart = new Chart(ctx, config);
+            if (chartVarName === 'chart55') chart55 = newChart;
+            if (chartVarName === 'chart65') chart65 = newChart;
+        }
+
+        function renderMainChart(data) {
+            const ctx = document.getElementById('mainChart');
+            if (mainChart) mainChart.destroy();
+
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.age),
+                    datasets: [
+                        { label: 'OA', data: data.map(d => d.OA), borderColor: '#3b82f6', backgroundColor: '#3b82f6', pointRadius: 0, borderWidth: 2, tension: 0.1 },
+                        { label: 'RA', data: data.map(d => d.RA), borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, pointRadius: 0, borderWidth: 2, tension: 0.1 },
+                        { label: 'MA', data: data.map(d => d.MA), borderColor: '#10b981', backgroundColor: '#10b981', pointRadius: 0, borderWidth: 2, tension: 0.1 },
+                        { label: 'SA', data: data.map(d => d.SA), borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', borderDash: [5, 5], pointRadius: 0, borderWidth: 2, tension: 0.1 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { ticks: { callback: v => '$' + v/1000 + 'k' }, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
