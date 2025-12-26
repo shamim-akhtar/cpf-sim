@@ -18,6 +18,13 @@ Found an issue? Have a suggestion? Feel free to open an issue or reach out!
 
 # CPF Simulator
 
+<!-- Simulator Link Button -->
+<p align="center">
+  <a href="https://github.com/shamim-akhtar/cpf-sim">
+    <img src="https://img.shields.io/badge/🚀_Launch-CPF_Simulator_2026-059669?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Launch Simulator" height="40"/>
+  </a>
+</p>
+
 A modern, responsive web-based CPF Simulator designed to forecast CPF balances based on **2026 Rules** and beyond. Built using **HTML5**, **Tailwind CSS**, and **Chart.js** for a clean, single-file deployment.
 
 > [!IMPORTANT]
