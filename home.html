@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPF Simulator 2026 - Plan Your Future</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .bg-grid {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans overflow-hidden relative">
+
+    <!-- Background Decoration -->
+    <div class="absolute inset-0 bg-grid opacity-20 pointer-events-none"></div>
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600 rounded-full blur-[120px] opacity-20"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600 rounded-full blur-[120px] opacity-10"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 text-center">
+        
+        <!-- Icon / Logo -->
+        <div class="animate-float mb-8 p-6 bg-slate-800/50 rounded-2xl border border-slate-700 backdrop-blur-sm shadow-2xl">
+            <i class="fa-solid fa-calculator text-6xl bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent"></i>
+        </div>
+
+        <!-- Typography -->
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
+            CPF Simulator
+            <span class="block text-2xl md:text-3xl mt-2 font-normal text-slate-400">2026 Edition</span>
+        </h1>
+
+        <p class="text-lg md:text-xl text-slate-400 max-w-2xl mb-10 leading-relaxed">
+            Project your retirement balances with the latest rules. <br class="hidden md:inline">
+            Visualize SA closure, limits, and payout eligibility in seconds.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <a href="index.html" class="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold text-lg transition-all shadow-lg hover:shadow-blue-500/25 flex items-center justify-center">
+                Launch Simulator
+                <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+            
+            <a href="infographic.html" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg font-semibold text-lg transition-all text-slate-300 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-circle-info mr-2"></i>
+                How It Works
+            </a>
+        </div>
+
+        <!-- Footer / Credits -->
+        <div class="absolute bottom-8 text-slate-600 text-xs">
+            <p>Educational Tool. Not Financial Advice.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
