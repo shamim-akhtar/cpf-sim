@@ -75,7 +75,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             <!-- LEFT COLUMN: Inputs (Sticky) -->
-            <div class="lg:col-span-4 space-y-5 sticky top-24">
+            <!-- FIX: Added lg: prefix to sticky and top-24 so it only sticks on large screens -->
+            <div class="lg:col-span-4 space-y-5 lg:sticky lg:top-24">
                 <form id="simForm" onsubmit="event.preventDefault(); runSimulation();" class="space-y-5">
                     
                     <!-- Card: Personal -->
