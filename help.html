@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Guide - CPF Simulator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .step-number {
+            width: 2rem;
+            height: 2rem;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="font-bold text-xl text-blue-900 flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-blue-600"></i> User Guide
+            </div>
+            <a href="index.html" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Back to Simulator
+            </a>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="max-w-5xl mx-auto px-4 py-12">
+
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">How to Use the CPF Simulator</h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+                A step-by-step guide to configuring your profile, understanding the advanced options, and interpreting your retirement projections.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Sidebar Navigation (Sticky on Desktop) -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:sticky lg:top-24">
+                    <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider">Table of Contents</h3>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li><a href="#step1" class="hover:text-blue-600 flex items-center"><i class="fa-solid fa-user-circle w-6 text-slate-400"></i> Profile & Income</a></li>
+                        <li><a href="#step2" class="hover:text-blue-600 flex items-center"><i class="fa-solid fa-wallet w-6 text-slate-400"></i> Current Balances</a></li>
+                        <li><a href="#step3" class="hover:text-blue-600 flex items-center"><i class="fa-solid fa-sliders w-6 text-slate-400"></i> Projections & ERS</a></li>
+                        <li><a href="#step4" class="hover:text-blue-600 flex items-center"><i class="fa-solid fa-file-invoice-dollar w-6 text-slate-400"></i> Advanced Inputs</a></li>
+                        <li><a href="#step5" class="hover:text-blue-600 flex items-center"><i class="fa-solid fa-chart-line w-6 text-slate-400"></i> Interpreting Results</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-12">
+
+                <!-- Step 1 -->
+                <section id="step1" class="scroll-mt-28">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="step-number">1</div>
+                        <h2 class="text-xl font-bold text-slate-900">Setting Up Profile & Income</h2>
+                    </div>
+                    
+                    <!-- Screenshot Placeholder -->
+                    <div class="mb-4 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                        <img src="https://placehold.co/600x250/f8fafc/cbd5e1?text=Screenshot:+Profile+%26+Income+Input+Card" alt="Profile Inputs" class="w-full h-auto">
+                        <p class="text-xs text-slate-400 bg-slate-50 p-2 text-center italic">Replace this image with a screenshot of the Profile & Income card.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <p class="text-sm text-slate-600">
+                            Enter your basic demographics. This determines how many years the simulation runs and what allocation rates apply.
+                        </p>
+                        <ul class="list-disc list-inside text-sm text-slate-600 space-y-2 ml-2">
+                            <li><strong>Age:</strong> Your current age. The simulation runs until age 65.</li>
+                            <li><strong>Bonus:</strong> Number of months of bonus you receive annually. This is credited in the first month (January) of the simulation year.</li>
+                            <li><strong>Gross Salary:</strong> Your monthly salary. <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">Note:</span> This is automatically capped at <strong>$8,000</strong> (the 2026 Ordinary Wage ceiling).</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Step 2 -->
+                <section id="step2" class="scroll-mt-28">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="step-number">2</div>
+                        <h2 class="text-xl font-bold text-slate-900">Entering Current Balances</h2>
+                    </div>
+
+                    <!-- Screenshot Placeholder -->
+                    <div class="mb-4 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                        <img src="https://placehold.co/600x200/f8fafc/cbd5e1?text=Screenshot:+Current+Balances+Card" alt="Current Balances Inputs" class="w-full h-auto">
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-sm text-slate-600 mb-4">
+                            Input the current amounts in your CPF accounts. You can find these by logging into the official CPF portal.
+                        </p>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <span class="block font-bold text-blue-800 text-sm">OA</span>
+                                <span class="text-xs text-blue-600">Ordinary</span>
+                            </div>
+                            <div class="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                <span class="block font-bold text-purple-800 text-sm">SA</span>
+                                <span class="text-xs text-purple-600">Special</span>
+                            </div>
+                            <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                                <span class="block font-bold text-emerald-800 text-sm">MA</span>
+                                <span class="text-xs text-emerald-600">Medisave</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 3 -->
+                <section id="step3" class="scroll-mt-28">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="step-number">3</div>
+                        <h2 class="text-xl font-bold text-slate-900">Projections & ERS Target</h2>
+                    </div>
+
+                    <!-- Screenshot Placeholder -->
+                    <div class="mb-4 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                        <img src="https://placehold.co/600x220/f8fafc/cbd5e1?text=Screenshot:+Projections+and+ERS+Toggle" alt="Projections Inputs" class="w-full h-auto">
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm mb-1">Growth Rates</h4>
+                            <p class="text-sm text-slate-600">
+                                Adjust how fast the <strong>Full Retirement Sum (FRS)</strong> and <strong>Basic Healthcare Sum (BHS)</strong> limits grow annually. Default is usually 3.5% - 4.0%.
+                            </p>
+                        </div>
+                        <div class="border-t border-slate-100 pt-4">
+                            <h4 class="font-bold text-slate-800 text-sm mb-1 flex items-center">
+                                <span class="mr-2">Target ERS at 55?</span>
+                                <i class="fa-solid fa-toggle-on text-emerald-500 text-lg"></i>
+                            </h4>
+                            <p class="text-sm text-slate-600">
+                                <strong>Unchecked (Default):</strong> At age 55, the simulator creates your Retirement Account (RA) targeting the <strong>FRS</strong>.
+                                <br><br>
+                                <strong>Checked:</strong> The simulator attempts to fill your RA up to the <strong>Enhanced Retirement Sum (ERS)</strong> (which is 2x FRS in 2026 rules) using funds from your SA and OA.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 4 -->
+                <section id="step4" class="scroll-mt-28">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="step-number">4</div>
+                        <h2 class="text-xl font-bold text-slate-900">Advanced Mode (Optional)</h2>
+                    </div>
+
+                    <!-- Screenshot Placeholder -->
+                    <div class="mb-4 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                        <img src="https://placehold.co/600x350/f8fafc/cbd5e1?text=Screenshot:+Advanced+Panel+(Cash,+Housing,+Insurance)" alt="Advanced Inputs" class="w-full h-auto">
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-inner space-y-4">
+                        <p class="text-sm text-slate-600">
+                            Click <strong>"Show Advanced"</strong> to reveal granular inputs.
+                        </p>
+                        
+                        <div class="flex gap-4 items-start">
+                            <i class="fa-solid fa-hand-holding-dollar text-slate-400 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Voluntary Cash Top-ups</h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Simulate monthly cash additions. The app automatically stops accepting cash once you hit the <strong>$37,740 annual limit</strong> (mandatory + voluntary).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <i class="fa-solid fa-house-chimney text-slate-400 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Housing Deduction</h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Enter your monthly mortgage payment (paid via OA).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start">
+                            <i class="fa-solid fa-file-medical text-slate-400 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">Insurance Premiums</h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Set annual premium amounts for MediShield/ElderShield (deducted from MA) and DPS/HPS (deducted from OA). You can select the specific month these are deducted.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 5 -->
+                <section id="step5" class="scroll-mt-28">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="step-number">5</div>
+                        <h2 class="text-xl font-bold text-slate-900">Interpreting the Output</h2>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Snapshots -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-800 mb-2 flex items-center">
+                                <i class="fa-regular fa-id-card mr-2 text-blue-500"></i> Snapshot Cards (Age 55 & 65)
+                            </h3>
+                            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                                <img src="https://placehold.co/300x150/f8fafc/cbd5e1?text=Card:+Age+55" class="rounded border border-slate-200 flex-1">
+                                <img src="https://placehold.co/300x150/f8fafc/cbd5e1?text=Card:+Age+65" class="rounded border border-slate-200 flex-1">
+                            </div>
+                            <p class="text-sm text-slate-600 mb-4">
+                                These cards show your exact account standings at critical milestones. 
+                                <br><strong>Age 55:</strong> Shows the result immediately after the SA Closure and RA creation.
+                                <br><strong>Age 65:</strong> Shows your final balance before payout eligibility.
+                            </p>
+                        </div>
+
+                        <!-- Financial Summary -->
+                        <div class="bg-slate-800 text-slate-100 p-6 rounded-xl border border-slate-700 shadow-sm">
+                            <h3 class="font-bold mb-2 flex items-center text-emerald-400">
+                                <i class="fa-solid fa-magnifying-glass-chart mr-2"></i> Financial Summary
+                            </h3>
+                            <p class="text-sm text-slate-300 mb-4">
+                                This text block analyzes your data to answer:
+                            </p>
+                            <ul class="list-disc list-inside text-sm text-slate-400 ml-2">
+                                <li>Did you meet your FRS/ERS target?</li>
+                                <li>What is your estimated monthly <strong>CPF LIFE payout</strong>?</li>
+                            </ul>
+                        </div>
+
+                        <!-- Ledger -->
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-800 mb-2 flex items-center">
+                                <i class="fa-solid fa-table-list mr-2 text-slate-500"></i> The Ledger
+                            </h3>
+                            <!-- Screenshot Placeholder -->
+                            <div class="mb-4 rounded overflow-hidden border border-slate-200 shadow-sm">
+                                <img src="https://placehold.co/600x150/f8fafc/cbd5e1?text=Screenshot:+Detailed+Ledger+Rows" alt="Ledger Screenshot" class="w-full h-auto">
+                            </div>
+                            <p class="text-sm text-slate-600 mb-4">
+                                The table at the bottom is the "source of truth". Look at the <strong>Notes</strong> column for colored pills:
+                            </p>
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded border border-green-200">Int: $12k</span>
+                                <span class="text-slate-500 flex items-center">Interest Credited</span>
+                                
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded border border-blue-200 ml-2">MA>SA</span>
+                                <span class="text-slate-500 flex items-center">Overflow Transfer</span>
+
+                                <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded border border-purple-200 ml-2">Housing</span>
+                                <span class="text-slate-500 flex items-center">Deductions</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Final CTA -->
+                <div class="mt-12 text-center">
+                    <a href="index.html" class="inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-blue-500/30">
+                        Try the Simulator Now
+                        <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm border-t border-slate-800 mt-12">
+        <p>&copy; 2026 CPF Simulator. Educational Tool Only.</p>
+    </footer>
+
+</body>
+</html>
