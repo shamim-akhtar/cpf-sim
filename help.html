@@ -222,8 +222,13 @@
                                 <i class="fa-regular fa-id-card mr-2 text-blue-500"></i> Snapshot Cards (Age 55 & 65)
                             </h3>
                             <div class="flex flex-col md:flex-row gap-4 mb-4">
-                                <img src="https://raw.githubusercontent.com/shamim-akhtar/cpf-sim/main/images/55.JPG" class="rounded border border-slate-200 flex-1">
-                                <img src="https://raw.githubusercontent.com/shamim-akhtar/cpf-sim/main/images/65.JPG" class="rounded border border-slate-200 flex-1">
+                                <!-- FIX: Wrapped in div with min-w-0 to prevent flex overflow -->
+                                <div class="flex-1 min-w-0">
+                                    <img src="https://raw.githubusercontent.com/shamim-akhtar/cpf-sim/main/images/55.JPG" class="w-full h-auto rounded border border-slate-200 shadow-sm" alt="Age 55 Snapshot">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <img src="https://raw.githubusercontent.com/shamim-akhtar/cpf-sim/main/images/65.JPG" class="w-full h-auto rounded border border-slate-200 shadow-sm" alt="Age 65 Snapshot">
+                                </div>
                             </div>
                             <p class="text-sm text-slate-600 mb-4">
                                 These cards show your exact account standings at critical milestones. 
